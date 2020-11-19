@@ -69,7 +69,7 @@ export default {
         password: this.form.password,
       },)
       .then(response => {
-        print(response.validateResult)
+        console.log(response)
       })
       alert(JSON.stringify(this.form));
     },

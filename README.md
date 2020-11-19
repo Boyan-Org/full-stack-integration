@@ -74,7 +74,7 @@ Setup
 $ yarn install
 $ pipenv install --dev && pipenv shell
 $ python manage.py migrate
-```
+``` 
 
 ## Running Development Servers
 

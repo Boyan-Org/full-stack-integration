@@ -33,9 +33,11 @@ def login(request):
         # serializer = AccountSerializer(data=request.data)
         # if serializer.is_valid():
         data = JSONParser().parse(request)
+        print(data)
         try:
             account = Account.objects.get(username=data['username'])
         except Account.DoesNotExist:
+            print("Oh shit, account not found")
             return Response(status=status.HTTP_404_NOT_FOUND)
         else:
             if account.password != data['password']:
