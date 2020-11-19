@@ -1,7 +1,7 @@
 {
-    "name": "Django VueJs Template",
+    "name": "full-stack-integration",
     "description": "",
-    "repository": "https://github.com/gtalarico/django-vue-template",
+    "repository": "https://github.com/Boyan-Org/full-stack-integration",
     "keywords": ["django", "vue", "vuejs", "template", "django rest framework"],
     "env": {
       "DJANGO_SETTINGS_MODULE": {
