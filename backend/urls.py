@@ -8,11 +8,11 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
-from .api.views import index_view, MessageViewSet
+from .api.views import index_view
 from .api.views import login
 
 router = routers.DefaultRouter()
-router.register('messages', MessageViewSet)
+# router.register('messages', MessageViewSet)
 
 urlpatterns = [
 

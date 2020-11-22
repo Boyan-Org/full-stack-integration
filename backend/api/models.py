@@ -18,13 +18,13 @@ class Account(models.Model):
         db_table = 'account'
 
 
-class Message(models.Model):
-    subject = models.CharField(max_length=200)
-    body = models.TextField()
+# class Message(models.Model):
+#     subject = models.CharField(max_length=200)
+#     body = models.TextField()
 
 
-class MessageSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Message
-        fields = ('url', 'subject', 'body', 'pk')
+# class MessageSerializer(serializers.HyperlinkedModelSerializer):
+#     class Meta:
+#         model = Message
+#         fields = ('url', 'subject', 'body', 'pk')
 
