@@ -9,7 +9,8 @@ from django.urls import path, include
 from rest_framework import routers
 
 from .api.views import index_view, MessageViewSet
-from .api.views import login
+from .api.views import login, register
+
 
 router = routers.DefaultRouter()
 router.register('messages', MessageViewSet)
@@ -26,6 +27,9 @@ urlpatterns = [
     path('api/admin/', admin.site.urls),
 
     path('api/login/', login),
+    # path('api/login/', AccountManager.as_view()),
+
+    path('api/register/', register),
 
 ]
 
