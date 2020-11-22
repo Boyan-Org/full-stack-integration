@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
+
 from .api.views import index_view
 from .api.views import login
 
@@ -25,5 +26,8 @@ urlpatterns = [
     path('api/admin/', admin.site.urls),
 
     path('api/login/', login),
+    # path('api/login/', AccountManager.as_view()),
+
+    path('api/register/', register),
 
 ]
