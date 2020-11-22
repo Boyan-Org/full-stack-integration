@@ -10,7 +10,7 @@ from rest_framework import routers
 
 
 from .api.views import index_view
-from .api.views import login
+from .api.views import login, register
 
 router = routers.DefaultRouter()
 
