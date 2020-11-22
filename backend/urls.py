@@ -12,7 +12,6 @@ from .api.views import index_view
 from .api.views import login
 
 router = routers.DefaultRouter()
-# router.register('messages', MessageViewSet)
 
 urlpatterns = [
 
@@ -28,5 +27,3 @@ urlpatterns = [
     path('api/login/', login),
 
 ]
-
-
