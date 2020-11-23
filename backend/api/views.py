@@ -17,7 +17,30 @@ index_view = never_cache(TemplateView.as_view(template_name='index.html'))
 @api_view(['POST'])
 def login(request):
     """
-    verify the login credentials.
+    PATH:
+        `localhost:8000/api/login/`
+
+    Description:
+            Login request handler.
+
+    Request Format: (JSON)
+
+        { username: "frank",
+            password: "frank" }
+
+    Request Status:
+
+        200: Success
+        401: `password` doesn't match the `username`
+        404: `username` not found
+
+    Response Format: (JSON)
+
+        { id: 1,
+            username: "frank",
+            password: "frank",
+            role    : "patient", ..}
+
     """
     data = JSONParser().parse(request)
     try:
@@ -51,11 +74,41 @@ def login(request):
                 pass
 
 
-
 @api_view(['POST'])
 def register(request):
     """
-    patients register.
+    PATH:
+        `localhost:8000/api/register/`
+
+    Description:
+        Register request handler.
+
+    Request Format: (JSON)
+
+        { username   : "boyan",
+            password: "boyan",
+            role    : "patient",
+            patient : {
+                name       : "Boyan Xu",
+                age        : 21,
+                bloodType  : "A",
+                allergies  : null
+                phoneNumber: 123
+            }
+        }
+
+    Request Status:
+
+        201: Success
+        409: `Username` already taken by someone else
+
+    Response Format: (JSON)
+
+        { username: "frank",
+            password: "frank",
+            role    : "patient", ..
+        }
+
     """
     data = JSONParser().parse(request)
     personal_info = data.pop('personal_info')
@@ -71,6 +124,7 @@ def register(request):
     else:
         return Response(serializer.data, status=status.HTTP_409_CONFLICT)
 
+
 class PatientViewSet(viewsets.ModelViewSet):
     """
     provides `list`, `create`, `retrieve`, `update` and `destroy` actions
@@ -78,13 +132,10 @@ class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
 
+
 class DoctorViewSet(viewsets.ModelViewSet):
     """
     provides `list`, `create`, `retrieve`, `update` and `destroy` actions
     """
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
-
-
-
-
