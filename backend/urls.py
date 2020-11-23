@@ -10,24 +10,26 @@ from rest_framework import routers
 
 
 from .api.views import index_view
-from .api.views import login, register
+from .api import views
 
 router = routers.DefaultRouter()
+router.register('patient', views.PatientViewSet)
+router.register('doctor', views.DoctorViewSet)
 
 urlpatterns = [
 
     # http://localhost:8000/
     path('', index_view, name='index'),
 
-    # http://localhost:8000/api/<router-viewsets>
-    path('api/', include(router.urls)),
-
     # http://localhost:8000/api/admin/
     path('api/admin/', admin.site.urls),
 
-    path('api/login/', login),
+    # http://localhost:8000/api/<router-viewsets>
+    path('api/', include(router.urls)),
+
+    path('api/login/', views.login),
     # path('api/login/', AccountManager.as_view()),
 
-    path('api/register/', register),
+    path('api/register/', views.register),
 
 ]

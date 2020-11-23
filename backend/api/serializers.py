@@ -14,10 +14,11 @@ class DoctorSerializer(serializers.ModelSerializer):
 
 class AccountSerializer(serializers.ModelSerializer):
     patient = PatientSerializer()
+    # doctor = DoctorSerializer()
     class Meta:
         model = Account
         fields = ['patient', 'username', 'password', 'role']
-    def create(self, validated_data):
+    def create(self, validated_data): # only patient can create account
         patient = validated_data.pop('patient')
         account = Account.objects.create(**validated_data)
         Patient.objects.create(account=account, **patient)

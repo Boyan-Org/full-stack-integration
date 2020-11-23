@@ -24,10 +24,9 @@ class Patient(models.Model):
     phoneNumber = models.CharField(max_length=11, blank=False)
     allergies = models.CharField(max_length=100)
     bloodType = models.CharField(max_length=1, blank=False)
-    account = models.OneToOneField(
+    account = models.ForeignKey(
         Account,
         on_delete=models.CASCADE,
-        primary_key=True,
     )
     class Meta:
         db_table = 'patient'
@@ -36,10 +35,9 @@ class Doctor(models.Model):
     name = models.CharField(max_length=100, blank=False)
     age = models.IntegerField(blank=False)
     phoneNumber = models.CharField(max_length=11, blank=False)
-    account = models.OneToOneField(
+    account = models.ForeignKey(
         Account,
         on_delete=models.CASCADE,
-        primary_key=True,
     )
     class Meta:
         db_table = 'doctor'

@@ -28,8 +28,17 @@ def login(request):
         if account.password != data['password']:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         else:
-            serializer2 = AccountSerializer(account)
-            return Response(serializer2.data, status=status.HTTP_200_OK)
+            role = account.role
+            if role == 'patient':
+                serializer = AccountSerializer(account)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            elif role == 'doctor':
+                serializer = AccountSerializer(account)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                # reserved for admin
+                pass
+
 
 
 @api_view(['POST'])
