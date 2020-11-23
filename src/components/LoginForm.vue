@@ -57,25 +57,46 @@ export default {
       }
 
       // contact server for corresponding user info
-      axios.post("http://127.0.0.1:8000/login/", {"username":this.form.username, "password":this.form.password}).then(resp=>{
-        console.log(resp)
-        // if user does not exist
-        if(resp.error == 404){
+      // axios.post("/api/login/", {"username":this.form.username, "password":this.form.password}).then(resp=>{
+      //   console.log(resp)
+      //   // if user does not exist
+      //   if(resp.error == 404){
+      //     this.onReset
+      //   }
+      //   // if wrong password
+      //   if(resp.error == 401){
+      //     // cleaer password to re-enter
+      //     this.form.password = ""
+      //     this.show = false;
+      //     this.$nextTick(() => {
+      //        this.show = true;
+      //     })
+      //   }
+      //   // if no problem, save it in the cookie and jump to Dashboard
+
+
+      // })
+      axios.post("/api/login/", {"username":this.form.username, "password":this.form.password}).then(resp=>{
+          console.log(resp) 
+      }).catch(error=>{
+        if(error.response.status === 404){
           this.onReset
+          // pop a warning
+          console.log("yeah 404")
         }
-        // if wrong password
-        if(resp.error == 401){
+        else if(error.response.status === 401){
           // cleaer password to re-enter
           this.form.password = ""
           this.show = false;
           this.$nextTick(() => {
              this.show = true;
           })
+          console.log("yeah 401")
         }
-        // if no problem, save it in the cookie and jump to Dashboard
-
-
       })
+
+
+
       //TODO: wrong password or username (not exist)
       evt.preventDefault();
       alert(JSON.stringify(this.form));
