@@ -29,12 +29,25 @@ def login(request):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         else:
             role = account.role
+            id = account.id
             if role == 'patient':
-                serializer = AccountSerializer(account)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                # TODO: try before get
+                patient = Patient.objects.get(account_id=id)
+                serializer = PatientSerializer(patient)
+                return_data = dict(serializer.data)
+                return_data["role"] = role
+                return_data["id"] = id
+                return_data.update(data)
+                return Response(return_data, status=status.HTTP_200_OK)
             elif role == 'doctor':
-                serializer = AccountSerializer(account)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                # TODO: try before get
+                doctor = Doctor.objects.get(account_id=id)
+                serializer = DoctorSerializer(doctor)
+                return_data = dict(serializer.data)
+                return_data["role"] = role
+                return_data["id"] = id
+                return_data.update(data)
+                return Response(return_data, status=status.HTTP_200_OK)
             else:
                 # reserved for admin
                 pass
