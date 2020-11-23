@@ -1,12 +1,12 @@
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
-# from rest_framework import viewsets
+from rest_framework import viewsets
 
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Account
-from .serializers import AccountSerializer
+from .models import Account, Patient, Doctor
+from .serializers import AccountSerializer, PatientSerializer, DoctorSerializer
 from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
 
@@ -28,8 +28,8 @@ def login(request):
         if account.password != data['password']:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         else:
-            serializer = AccountSerializer(account)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer2 = AccountSerializer(account)
+            return Response(serializer2.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -40,7 +40,24 @@ def register(request):
     serializer = AccountSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.data, status=status.HTTP_409_CONFLICT)
+        return Response(request.data, status=status.HTTP_200_OK)
+    else:
+        return Response(serializer.data, status=status.HTTP_409_CONFLICT)
+
+class PatientViewSet(viewsets.ModelViewSet):
+    """
+    provides `list`, `create`, `retrieve`, `update` and `destroy` actions
+    """
+    queryset = Patient.objects.all()
+    serializer_class = PatientSerializer
+
+class DoctorViewSet(viewsets.ModelViewSet):
+    """
+    provides `list`, `create`, `retrieve`, `update` and `destroy` actions
+    """
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorSerializer
+
+
 
 
