@@ -1,46 +1,27 @@
-# Django Vue Template ✌️ 🐍
-
+# Next-gen EHS 🐍
 ![Vue Logo](/src/assets/logo-vue.png "Vue Logo")
 ![Django Logo](/src/assets/logo-django.png "Django Logo")
 
-This template is a minimal example for an application using Vue and Django.
+This is the course project for CSCI-410. We built a platform that allows easy and secure storage and retrieval of **medical records** for both the patients🤕 and the doctors👨🏻‍⚕️.
 
-Vue and Django are clearly separated in this project. Vue, Yarn and Webpack handles all frontend logic and bundling assessments. Django and Django REST framework to manage Data Models, Web API and serve static files.
+With personal information and medical records digitized, we can provide a smooth workflow among departments and people that the needed information will be delivered to the right person and new information will be collected automatically to form a new record entry.
 
-While it's possible to add endpoints to serve django-rendered html responses, the intention is to use Django primarily for the backend, and have view rendering and routing and handled by Vue + Vue Router as a Single Page Application (SPA).
+At the bottom level, all the account information and record data are encrypted. We will also implement an access control mechanism to ensure certain information is only visible to specific user groups.
 
-Out of the box, Django will serve the application entry point (`index.html` + bundled assets) at `/` ,
-data at `/api/`, and static files at `/static/`. Django admin panel is also available at `/admin/` and can be extended as needed.
-
-The application templates from Vue CLI `create` and Django `createproject` are kept as close as possible to their
-original state, except where a different configuration is needed for better integration of the two frameworks.
-
-#### Alternatives
-
-If this setup is not what you are looking for, you might want look at other similar projects:
-
-* [ariera/django-vue-template](https://github.com/ariera/django-vue-template)
-* [vchaptsev/cookiecutter-django-vue](https://github.com/vchaptsev/cookiecutter-django-vue)
-
-Prefer Flask? Checkout my [gtalarico/flask-vuejs-template](https://github.com/gtalarico/flask-vuejs-template)
-
-### Demo
-
-[Live Demo](https://django-vue-template-demo.herokuapp.com/)
-
-### Includes
-
+### Major Dependency
+Backend side
 * Django
 * Django REST framework
 * Django Whitenoise, CDN Ready
+
+Frontend side
 * Vue CLI 3
 * Vue Router
-* Vuex
 * Gunicorn
 * Configuration for Heroku Deployment
 
 
-### Template Structure
+### Project Stricture
 
 
 | Location             |  Content                                   |
@@ -60,69 +41,63 @@ Before getting started you should have the following installed and running:
 - [X] Yarn - [instructions](https://yarnpkg.com/en/docs/install)
 - [X] Vue CLI 3 - [instructions](https://cli.vuejs.org/guide/installation.html)
 - [X] Python 3 - [instructions](https://wiki.python.org/moin/BeginnersGuide)
-- [X] Pipenv - [instructions](https://pipenv.readthedocs.io/en/latest/install/#installing-pipenv)
+- [X] Anaconda - [instructions](https://www.anaconda.com/products/individual)
 
-## Setup Template
+## Setup Codebase
+
+**Step 1** : Clone the repo to local machine
 
 ```
-$ git clone https://github.com/gtalarico/django-vue-template
-$ cd django-vue-template
+$ git clone https://github.com/Boyan-Org/full-stack-integration
+$ cd full-stack-integration
 ```
 
-Setup
+**Step 2** : Install JavaScript dependencies
 ```
 $ yarn install
-$ pipenv install --dev && pipenv shell
+```
+**Step 3** : Initialize python virtual environment ([why?](https://stackoverflow.com/questions/41972261/what-is-a-virtualenv-and-why-should-i-use-one))
+```
+$ conda create -n venv
+$ conda activate venv
+```
+**Step 4** : Install Python dependencies
+```
+$ pip install -r requirement.txt
+```
+**Step 5** : Initialize sqlite database
+```
 $ python manage.py migrate
-``` 
+```
+- To inspect sqlite database from GUI, install [Sqlite Browser](https://sqlitebrowser.org/dl/)
 
 ## Running Development Servers
 
+Step 1 : Run Django server
 ```
 $ python manage.py runserver
 ```
+- The Django API and static files will be served from [`localhost:8000`](http://localhost:8000/).
 
-From another tab in the same directory:
-
+Step 2 : Run Vue.js server (in another tab)
 ```
 $ yarn serve
 ```
+- The Vue application will be served from [`localhost:8080`](http://localhost:8080/)
 
-The Vue application will be served from [`localhost:8080`](http://localhost:8080/) and the Django API
-and static files will be served from [`localhost:8000`](http://localhost:8000/).
-
-The dual dev server setup allows you to take advantage of
+Note:
+- The dual dev server setup allows you to take advantage of
 webpack's development server with hot module replacement.
-Proxy config in [`vue.config.js`](/vue.config.js) is used to route the requests
-back to django's API on port 8000.
 
-If you would rather run a single dev server, you can run Django's
-development server only on `:8000`, and you have to build the Vue app first
-and the page will not reload on changes.
+- Proxy config in [`vue.config.js`](/vue.config.js) is used to route the requests back to Django's API on port `8000`.
+
+- If you would rather run a single dev server, you can run Django's
+development server only on `:8000`, and you have to build the Vue app first and the page will not reload on changes.
 
 ```
 $ yarn build
 $ python manage.py runserver
 ```
-## Pycharm additional configuration
-
-Follow this guide to ensure you have pipenv setup
-
-https://www.jetbrains.com/help/pycharm/pipenv.html
-
-Click "Edit Configurations"
-
-Select Django Server under templates
-
-Click + to create a config from the templates
-
-In Environment variables add
-
-```
-PYTHONUNBUFFERED=1;DJANGO_SETTINGS_MODULE=backend.settings.dev
-```
-
-Click Apply then Ok
 
 ## Deploy
 
