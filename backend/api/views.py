@@ -32,20 +32,18 @@ def login(request):
             id = account.id
             if role == 'patient':
                 # TODO: try before get
-                patient = Patient.objects.get(account_id=id)
+                patient = Patient.objects.get(id=id)
                 serializer = PatientSerializer(patient)
                 return_data = dict(serializer.data)
                 return_data["role"] = role
-                return_data["id"] = id
                 return_data.update(data)
                 return Response(return_data, status=status.HTTP_200_OK)
             elif role == 'doctor':
                 # TODO: try before get
-                doctor = Doctor.objects.get(account_id=id)
+                doctor = Doctor.objects.get(id=id)
                 serializer = DoctorSerializer(doctor)
                 return_data = dict(serializer.data)
                 return_data["role"] = role
-                return_data["id"] = id
                 return_data.update(data)
                 return Response(return_data, status=status.HTTP_200_OK)
             else:
@@ -59,10 +57,17 @@ def register(request):
     """
     patients register.
     """
-    serializer = AccountSerializer(data=request.data)
+    data = JSONParser().parse(request)
+    personal_info = data.pop('personal_info')
+    serializer = AccountSerializer(data=data)
     if serializer.is_valid():
-        serializer.save()
-        return Response(request.data, status=status.HTTP_200_OK)
+        account = serializer.save()
+        if data['role'] == "patient":
+            actor = Patient.objects.create(**personal_info, id=account)
+        else:
+            actor = Doctor.objects.create(**personal_info, id=account)
+        actor.save()
+        return Response(status=status.HTTP_201_CREATED)
     else:
         return Response(serializer.data, status=status.HTTP_409_CONFLICT)
 
