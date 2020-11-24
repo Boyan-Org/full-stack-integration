@@ -14,8 +14,7 @@
         </el-form-item>
         <el-button type="primary" @click="onSubmit">Login</el-button>
         <div>
-          <br />New User?
-          <el-link type="primary" @click="open">Create new account</el-link>
+          <br />New User? <el-link  type="primary" @click="open">Create new account</el-link>
         </div>
       </el-form>
     </div>
@@ -29,10 +28,8 @@
 </style>
 
 <script>
-import axios from 'axios';
-
+import axios from 'axios'
 export default {
-  name: "LoginForm",
   data() {
     return {
       nameError: "",
@@ -44,13 +41,9 @@ export default {
       show: true,
     };
   },
-  // computed: mapState({
-  //   messages: (state) => state.messages.messages,
-  // }),
   methods: {
-    onSubmit(evt) {
-      //submit login form
-      if (this.form.username == "") {
+    onSubmit(evt) { //submit login form
+      if (this.form.username == ""){
         this.nameError = "Please input your username";
         return;
       } else {
@@ -62,35 +55,64 @@ export default {
       } else {
         this.pwdError = "";
       }
+
+      // contact server for corresponding user info
+      // axios.post("/api/login/", {"username":this.form.username, "password":this.form.password}).then(resp=>{
+      //   console.log(resp)
+      //   // if user does not exist
+      //   if(resp.error == 404){
+      //     this.onReset
+      //   }
+      //   // if wrong password
+      //   if(resp.error == 401){
+      //     // cleaer password to re-enter
+      //     this.form.password = ""
+      //     this.show = false;
+      //     this.$nextTick(() => {
+      //        this.show = true;
+      //     })
+      //   }
+      //   // if no problem, save it in the cookie and jump to Dashboard
+
+
+      // })
+      axios.post("/api/login/", {"username":this.form.username, "password":this.form.password}).then(resp=>{
+          console.log(resp)
+      }).catch(error=>{
+        if(error.response.status === 404){
+          this.onReset
+          // pop a warning
+          console.log("yeah 404")
+        }
+        else if(error.response.status === 401){
+          // cleaer password to re-enter
+          this.form.password = ""
+          this.show = false;
+          this.$nextTick(() => {
+             this.show = true;
+          })
+          console.log("yeah 401")
+        }
+      })
+
+
+
       //TODO: wrong password or username (not exist)
       evt.preventDefault();
-      axios.post(`/api/login/`,{
-        username: this.form.username,
-        password: this.form.password,
-      },)
-      .then(response => {
-        console.log(response)
-      })
       alert(JSON.stringify(this.form));
     },
-
-    open() {
-      // Alert box before redirect to /register
-      this.$confirm(
-        "Self registration is only available to patients!",
-        "Alert",
-        {
-          distinguishCancelAndClose: true,
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-        }
-      )
-        .then(() => {
-          this.$router.push("/register");
-        })
-        .catch(() => {
-          (e) => e;
-        });
+    open() { // Alert box before redirect to /register
+      this.$confirm('Self registration is only available to patients!', 'Alert', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel'
+      })
+      .then(() => {
+        this.$router.push('/register');
+      })
+      .catch( () => {
+        e => e;
+      });
     },
     onReset(evt) {
       evt.preventDefault();

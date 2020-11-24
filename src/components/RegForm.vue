@@ -93,6 +93,11 @@ export default {
       }
       evt.preventDefault();
       alert(JSON.stringify(this.form));
+
+
+      // api: send regForm to the back end
+
+
     },
     onReset(evt) {
       evt.preventDefault();
