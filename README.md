@@ -73,13 +73,13 @@ $ python manage.py migrate
 
 ## Running Development Servers
 
-**Step 1** : Run Django server
+Step 1 : Run Django server
 ```
 $ python manage.py runserver
 ```
 - The Django API and static files will be served from [`localhost:8000`](http://localhost:8000/).
 
-**Step 2** : Run Vue.js server (in another tab)
+Step 2 : Run Vue.js server (in another tab)
 ```
 $ yarn serve
 ```

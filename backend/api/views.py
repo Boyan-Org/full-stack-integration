@@ -28,7 +28,7 @@ def login(request):
         { username: "frank",
             password: "frank" }
 
-    Response Status:
+    Request Status:
 
         200: Success
         401: `password` doesn't match the `username`
@@ -97,7 +97,7 @@ def register(request):
             }
         }
 
-    Response Status:
+    Request Status:
 
         201: Success
         409: `Username` already taken by someone else
