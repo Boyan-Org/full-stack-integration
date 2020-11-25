@@ -6,10 +6,11 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
-from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo
-from .serializers import AccountSerializer, PISerializer, DISerializer, MISerializer
+from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo, MedicalRecord
+from .serializers import AccountSerializer, PISerializer, DISerializer, MISerializer, MRSerializer
 from rest_framework.parsers import JSONParser
-from rest_framework.views import APIView
+from rest_framework.decorators import action
+# from rest_framework.views import APIView
 
 # Serve Vue Application
 index_view = never_cache(TemplateView.as_view(template_name='index.html'))
@@ -149,7 +150,7 @@ ModelViewSet
 
     II. path: PATH/<int:id> (e.g. localhost:8000/api/personal_info/3/)
         
-        Accept Methods: 'GET', 'PUT', 'DELETE' 
+        Accept Methods: 'GET', 'PUT', 'DELETE', 'PATCH'
 
         If request.method == 'GET':
             (Retrieve the record with the id)
@@ -185,6 +186,8 @@ ModelViewSet
             Response Status:
                 204: Deleted
                 404: Not Found
+        If request.method == 'PATCH':
+            (similar to PUT but it can do partial update)
 """
 
 class PIViewSet(viewsets.ModelViewSet):
@@ -208,5 +211,14 @@ class DIViewSet(viewsets.ModelViewSet):
     """
     queryset = DepartmentInfo.objects.all()
     serializer_class = DISerializer
+
+class MRViewSet(viewsets.ModelViewSet):
+    """
+    PATH: http://127.0.0.1:8000/api/medical_record/
+    """
+    queryset = MedicalRecord.objects.all()
+    serializer_class = MRSerializer
+    
+
 
 

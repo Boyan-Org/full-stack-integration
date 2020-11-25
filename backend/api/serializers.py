@@ -1,5 +1,10 @@
 from rest_framework import serializers
-from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo
+from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo, MedicalRecord
+
+class AccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = '__all__'
 
 class PISerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,8 +23,8 @@ class MISerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class AccountSerializer(serializers.ModelSerializer):
+class MRSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Account
+        model = MedicalRecord
         fields = '__all__'
 
