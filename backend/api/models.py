@@ -18,29 +18,49 @@ class Account(models.Model):
     class Meta:
         db_table = 'account'
 
-class Patient(models.Model):
+class PersonalInfo(models.Model):
+    id = models.OneToOneField(
+        Account,
+        on_delete=models.CASCADE,
+        primary_key=True
+    )
     name = models.CharField(max_length=100, blank=False)
-    age = models.IntegerField(blank=False)
-    phoneNumber = models.CharField(max_length=11, blank=False)
+    gender = models.CharField(max_length=100)
+    dateOfBirth = models.CharField(max_length=100)
+    email = models.CharField(max_length=100)
+    phoneNumber = models.CharField(max_length=11)
+    address = models.CharField(max_length=100)
+    maritalStatus = models.CharField(max_length=100)
+
+
+
+    class Meta:
+        db_table = 'personal_info'
+
+
+class MedicalInfo(models.Model):
+    id = models.OneToOneField(
+        Account,
+        on_delete=models.CASCADE,
+        primary_key=True
+    )
+    height = models.IntegerField()
+    weight = models.IntegerField()
+    familyHistory = models.CharField(max_length=100)
+    surgicalHistory = models.CharField(max_length=100)
     allergies = models.CharField(max_length=100)
-    bloodType = models.CharField(max_length=1, blank=False)
+    bloodType = models.CharField(max_length=1)
+    habits = models.CharField(max_length=100)
+    class Meta:
+        db_table = 'medical_info'
+
+class DepartmentInfo(models.Model):
     id = models.OneToOneField(
         Account,
         on_delete=models.CASCADE,
         primary_key=True
     )
+    department = models.CharField(max_length=100)
+    supervisor = models.CharField(max_length=100)
     class Meta:
-        db_table = 'patient'
-
-class Doctor(models.Model):
-    name = models.CharField(max_length=100, blank=False)
-    age = models.IntegerField(blank=False)
-    phoneNumber = models.CharField(max_length=11, blank=False)
-    id = models.OneToOneField(
-        Account,
-        on_delete=models.CASCADE,
-        primary_key=True
-    )
-    class Meta:
-        db_table = 'doctor'
-
+        db_table = 'dept_info'

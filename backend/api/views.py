@@ -5,8 +5,9 @@ from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Account, Patient, Doctor
-from .serializers import AccountSerializer, PatientSerializer, DoctorSerializer
+from rest_framework.status import HTTP_200_OK
+from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo
+from .serializers import AccountSerializer, PISerializer, DISerializer, MISerializer
 from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
 
@@ -39,7 +40,7 @@ def login(request):
         { id: 1,
             username: "frank",
             password: "frank",
-            role    : "patient", ..}
+            role    : "patient"} 
 
     """
     data = JSONParser().parse(request)
@@ -51,27 +52,11 @@ def login(request):
         if account.password != data['password']:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         else:
-            role = account.role
             id = account.id
-            if role == 'patient':
-                # TODO: try before get
-                patient = Patient.objects.get(id=id)
-                serializer = PatientSerializer(patient)
-                return_data = dict(serializer.data)
-                return_data["role"] = role
-                return_data.update(data)
-                return Response(return_data, status=status.HTTP_200_OK)
-            elif role == 'doctor':
-                # TODO: try before get
-                doctor = Doctor.objects.get(id=id)
-                serializer = DoctorSerializer(doctor)
-                return_data = dict(serializer.data)
-                return_data["role"] = role
-                return_data.update(data)
-                return Response(return_data, status=status.HTTP_200_OK)
-            else:
-                # reserved for admin
-                pass
+            data.update({"id": id})
+            personal_info = PersonalInfo.objects.get(id=id)
+            data.update({"name": personal_info.name})
+            return Response(data=data, status=HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -85,15 +70,10 @@ def register(request):
 
     Request Format: (JSON)
 
-        { username   : "boyan",
+        { username   : "userboyan",
             password: "boyan",
             role    : "patient",
-            patient : {
-                name       : "Boyan Xu",
-                age        : 21,
-                bloodType  : "A",
-                allergies  : null
-                phoneNumber: 123
+            name    : "Boyan Xu"
             }
         }
 
@@ -101,41 +81,132 @@ def register(request):
 
         201: Success
         409: `Username` already taken by someone else
-
-    Response Format: (JSON)
-
-        { username: "frank",
-            password: "frank",
-            role    : "patient", ..
-        }
-
     """
     data = JSONParser().parse(request)
-    personal_info = data.pop('personal_info')
+    name = data['name']
     serializer = AccountSerializer(data=data)
     if serializer.is_valid():
         account = serializer.save()
-        if data['role'] == "patient":
-            actor = Patient.objects.create(**personal_info, id=account)
-        else:
-            actor = Doctor.objects.create(**personal_info, id=account)
-        actor.save()
+        personal_info = PersonalInfo(name=name, id=account)
+        personal_info.save()
         return Response(status=status.HTTP_201_CREATED)
     else:
         return Response(serializer.data, status=status.HTTP_409_CONFLICT)
 
+"""
+ModelViewSet
 
-class PatientViewSet(viewsets.ModelViewSet):
+    There are two types of request headers:
+
+        I.  Path = api/...               (Used to create/list data records)
+        II. Path = api/.../<int:id>      (Used to update/delete/retrieve data records)
+
+    I. Path = api/...
+        (e.g. localhost:8000/api/personal_info/)
+        
+        Accept Methods: 'GET', 'POST'
+        
+        If request.method == 'GET':
+            (return all the records in the table)
+
+            Response Status:
+                200: OK
+                others: Bug in the code
+            
+            Respose Format: (JSON)
+                {
+                    {
+                        record1_column1: ...,
+                        record1_column2: ...,
+                        ...
+                    },
+                    {
+                        record2_column1: ...,
+                        record2_column2: ...,
+                        ...
+                    },
+                    ...
+                }
+            
+        If request.method == 'Post':
+            (create new record using the passed data)
+
+            Request Format: (JSON)
+            {
+                ALL_THE_COLUMNS_IN_TABLE: VALUE
+            }
+
+            Response Status:
+                201: Created
+                400: Creation Failed
+            
+            Respose Format of 400: (JSON)
+            {
+            FIELD: [
+                "ERROR_MESSAGE"
+                ]
+            }
+
+    II. path: PATH/<int:id> (e.g. localhost:8000/api/personal_info/3/)
+        
+        Accept Methods: 'GET', 'PUT', 'DELETE' 
+
+        If request.method == 'GET':
+            (Retrieve the record with the id)
+
+            Response Status:
+                200: OK
+                404: Not Found
+            
+            Response Formate of 200: (JSON)
+                    {
+                        record_column1: ...,
+                        record_column2: ...,
+                        ...
+                    }
+        If request.method == 'PUT':
+            (Update the record with the id)
+
+            Request Format: (JSON)
+            {
+                ALL_THE_COLUMNS_IN_TABLE: VALUE
+            }
+
+            Response Status:
+                200: OK
+                404: Not Found
+                400: Update Failed
+        
+            Response Format: (JSON)
+                The Request JSON
+
+        If request.method == 'DELETE':
+
+            Response Status:
+                204: Deleted
+                404: Not Found
+"""
+
+class PIViewSet(viewsets.ModelViewSet):
     """
-    provides `list`, `create`, `retrieve`, `update` and `destroy` actions
+    PATH: http://127.0.0.1:8000/api/personal_information/
     """
-    queryset = Patient.objects.all()
-    serializer_class = PatientSerializer
+    queryset = PersonalInfo.objects.all()
+    serializer_class = PISerializer
 
 
-class DoctorViewSet(viewsets.ModelViewSet):
+class MIViewSet(viewsets.ModelViewSet):
     """
-    provides `list`, `create`, `retrieve`, `update` and `destroy` actions
+    PATH: http://127.0.0.1:8000/api/medical_information/
     """
-    queryset = Doctor.objects.all()
-    serializer_class = DoctorSerializer
+    queryset = MedicalInfo.objects.all()
+    serializer_class = MISerializer
+
+class DIViewSet(viewsets.ModelViewSet):
+    """
+    PATH: http://127.0.0.1:8000/api/department_information/
+    """
+    queryset = DepartmentInfo.objects.all()
+    serializer_class = DISerializer
+
+
