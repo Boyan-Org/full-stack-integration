@@ -1,3 +1,4 @@
+import json
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
 from rest_framework import viewsets
@@ -5,7 +6,7 @@ from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK
+from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND
 from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo, MedicalRecord
 from .serializers import AccountSerializer, PISerializer, DISerializer, MISerializer, MRSerializer
 from rest_framework.parsers import JSONParser
@@ -218,7 +219,26 @@ class MRViewSet(viewsets.ModelViewSet):
     """
     queryset = MedicalRecord.objects.all()
     serializer_class = MRSerializer
-    
+
+    @action(detail=False, methods=['POST'])
+    def filter_record(self, request):
+        data = JSONParser().parse(request)
+        # get rid of NULL values
+        for key in data.keys():
+            if data[key] is None:
+                data.pop(key)
+        # print(data)
+        # return Response(status=HTTP_200_OK)
+        try: 
+            q = MedicalRecord.objects.filter(**data).values()
+        except MedicalRecord.DoesNotExist:
+            return Response(status=HTTP_404_NOT_FOUND)
+        else:
+            return_data = list(q)[0]
+            return_data.update({"record_num":len(return_data)})
+            print(return_data)
+            return Response(data=return_data, status=HTTP_200_OK)
+            # return Response(status=HTTP_200_OK)
 
 
 
