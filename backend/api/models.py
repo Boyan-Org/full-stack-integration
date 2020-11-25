@@ -30,6 +30,9 @@ class PersonalInfo(models.Model):
     email = models.CharField(max_length=100)
     phoneNumber = models.CharField(max_length=11)
     address = models.CharField(max_length=100)
+    maritalStatus = models.CharField(max_length=100)
+
+
 
     class Meta:
         db_table = 'personal_info'
@@ -47,6 +50,7 @@ class MedicalInfo(models.Model):
     surgicalHistory = models.CharField(max_length=100)
     allergies = models.CharField(max_length=100)
     bloodType = models.CharField(max_length=1)
+    habits = models.CharField(max_length=100)
     class Meta:
         db_table = 'medical_info'
 
@@ -59,4 +63,4 @@ class DepartmentInfo(models.Model):
     department = models.CharField(max_length=100)
     supervisor = models.CharField(max_length=100)
     class Meta:
-        db_table = 'department_info'
+        db_table = 'dept_info'
