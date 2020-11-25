@@ -5,8 +5,9 @@ from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Account, Patient, Doctor
-from .serializers import AccountSerializer, PatientSerializer, DoctorSerializer
+from rest_framework.status import HTTP_200_OK
+from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo
+from .serializers import AccountSerializer, PISerializer, DISerializer, MISerializer
 from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
 
@@ -39,7 +40,7 @@ def login(request):
         { id: 1,
             username: "frank",
             password: "frank",
-            role    : "patient", ..}
+            role    : "patient", ..} (including all the personal_info)
 
     """
     data = JSONParser().parse(request)
@@ -51,27 +52,11 @@ def login(request):
         if account.password != data['password']:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         else:
-            role = account.role
             id = account.id
-            if role == 'patient':
-                # TODO: try before get
-                patient = Patient.objects.get(id=id)
-                serializer = PatientSerializer(patient)
-                return_data = dict(serializer.data)
-                return_data["role"] = role
-                return_data.update(data)
-                return Response(return_data, status=status.HTTP_200_OK)
-            elif role == 'doctor':
-                # TODO: try before get
-                doctor = Doctor.objects.get(id=id)
-                serializer = DoctorSerializer(doctor)
-                return_data = dict(serializer.data)
-                return_data["role"] = role
-                return_data.update(data)
-                return Response(return_data, status=status.HTTP_200_OK)
-            else:
-                # reserved for admin
-                pass
+            data.update({"id": id})
+            personal_info = PersonalInfo.objects.get(id=id)
+            data.update({"name",personal_info.name})
+            return Response(data=data, status=HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -88,12 +73,7 @@ def register(request):
         { username   : "boyan",
             password: "boyan",
             role    : "patient",
-            patient : {
-                name       : "Boyan Xu",
-                age        : 21,
-                bloodType  : "A",
-                allergies  : null
-                phoneNumber: 123
+            name    : "Boyan Xu"
             }
         }
 
@@ -111,31 +91,35 @@ def register(request):
 
     """
     data = JSONParser().parse(request)
-    personal_info = data.pop('personal_info')
+    name = data['name']
     serializer = AccountSerializer(data=data)
     if serializer.is_valid():
         account = serializer.save()
-        if data['role'] == "patient":
-            actor = Patient.objects.create(**personal_info, id=account)
-        else:
-            actor = Doctor.objects.create(**personal_info, id=account)
-        actor.save()
+        personal_info = PersonalInfo(name=name, id=account)
+        personal_info.save()
         return Response(status=status.HTTP_201_CREATED)
     else:
         return Response(serializer.data, status=status.HTTP_409_CONFLICT)
 
 
-class PatientViewSet(viewsets.ModelViewSet):
+class PIViewSet(viewsets.ModelViewSet):
     """
     provides `list`, `create`, `retrieve`, `update` and `destroy` actions
     """
-    queryset = Patient.objects.all()
-    serializer_class = PatientSerializer
+    queryset = PersonalInfo.objects.all()
+    serializer_class = PISerializer
 
 
-class DoctorViewSet(viewsets.ModelViewSet):
+class MIViewSet(viewsets.ModelViewSet):
     """
     provides `list`, `create`, `retrieve`, `update` and `destroy` actions
     """
-    queryset = Doctor.objects.all()
-    serializer_class = DoctorSerializer
+    queryset = MedicalInfo.objects.all()
+    serializer_class = MISerializer
+
+class DIViewSet(viewsets.ModelViewSet):
+    """
+    provides `list`, `create`, `retrieve`, `update` and `destroy` actions
+    """
+    queryset = DepartmentInfo.objects.all()
+    serializer_class = DISerializer
