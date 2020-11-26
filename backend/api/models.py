@@ -68,8 +68,8 @@ class DepartmentInfo(models.Model):
 
 class MedicalRecord(models.Model):
     recordID = models.IntegerField(primary_key=True)
-    patientID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='patientID')
-    doctorID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='doctorID')
+    patient = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='patient')
+    doctor = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='doctor')
     date = models.DateTimeField(blank=False)
     symptoms = models.CharField(max_length=300)
     treatments = models.CharField(max_length=300)

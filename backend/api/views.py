@@ -228,8 +228,8 @@ class MRViewSet(viewsets.ModelViewSet):
         Description: return the filtered record that satisfies the requested criteria.
         Request JSON:
             {
-                column1: value1,
-                column2: value2,
+                column1: condition1,
+                column2: condition2,
                 ...
             }
         Response JSON:
@@ -237,28 +237,25 @@ class MRViewSet(viewsets.ModelViewSet):
                 "record_num": 1,
                 "record_data": [
                     {
-                        "attachmentNb": 0,
+                        "recordID": 1,
                         "date": "2020-11-26T15:00:00Z",
-                        "diagnosis": "sickness cuz of not taking the SE lecture for a week",
                         "doctorID_id": 4,
                         "patientID_id": 3,
-                        "recordID": 1,
-                        "symptoms": "Feeling sick",
-                        "treatments": "Go to the SE lecture"
+                        "patient_name": "Frank Zhou",
+                        doctor_name": "Boyan Xu",
                     },
                     {
-                        "attachmentNb": 0,
+                        "recordID": 2,
                         "date": "2020-11-26T15:00:00Z",
-                        "diagnosis": "sickness cuz of not taking the SE lecture for a week",
                         "doctorID_id": 4,
                         "patientID_id": 3,
-                        "recordID": 2,
-                        "symptoms": "Feeling sick",
-                        "treatments": "Go to the SE lecture"
+                        "patient_name": "Frank Zhou",
+                        "doctor_name": "Boyan Xu",
                     },
                     ...
                 ],
             }
+        
         """
         data = JSONParser().parse(request)
         # get rid of NULL values
@@ -270,10 +267,29 @@ class MRViewSet(viewsets.ModelViewSet):
         except MedicalRecord.DoesNotExist:
             return Response(status=HTTP_404_NOT_FOUND)
         else:
-            return_data = list(q)
-            return_data.update({"record_num":len(return_data)})
+            record_data = list(q)
+            return_data = {"record_num":len(record_data), "record_data":[]}
+            for record in record_data:
+                date = record["date"]
+                patient_name = get_name(record["patient_id"])
+                doctor_name = get_name(record["doctor_id"])
+                recordID = record["recordID"]
+                return_data["record_data"].append({
+                    "recordID":recordID, "date":date,
+                    "patient_name":patient_name, "doctor_name":doctor_name,
+                    "patient_id":record["patient_id"], "doctor_id":record["doctor_id"],
+                    })
             # print(return_data)
             return Response(data=return_data, status=HTTP_200_OK)
 
 
-
+def get_name(id):
+    """
+    convert id to PersonalInfo.name
+    """
+    try:
+        info = PersonalInfo.objects.get(id=id)
+    except PersonalInfo.DoesNotExist:
+        return Response(status=HTTP_404_NOT_FOUND)
+    else:
+        return info.name
