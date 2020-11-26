@@ -222,23 +222,58 @@ class MRViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['POST'])
     def filter_record(self, request):
+        """
+        PATH: http://127.0.0.1:8000/api/medical_record/filter_record/
+        Method: POST
+        Description: return the filtered record that satisfies the requested criteria.
+        Request JSON:
+            {
+                column1: value1,
+                column2: value2,
+                ...
+            }
+        Response JSON:
+            {
+                "record_num": 1,
+                "record_data": [
+                    {
+                        "attachmentNb": 0,
+                        "date": "2020-11-26T15:00:00Z",
+                        "diagnosis": "sickness cuz of not taking the SE lecture for a week",
+                        "doctorID_id": 4,
+                        "patientID_id": 3,
+                        "recordID": 1,
+                        "symptoms": "Feeling sick",
+                        "treatments": "Go to the SE lecture"
+                    },
+                    {
+                        "attachmentNb": 0,
+                        "date": "2020-11-26T15:00:00Z",
+                        "diagnosis": "sickness cuz of not taking the SE lecture for a week",
+                        "doctorID_id": 4,
+                        "patientID_id": 3,
+                        "recordID": 2,
+                        "symptoms": "Feeling sick",
+                        "treatments": "Go to the SE lecture"
+                    },
+                    ...
+                ],
+            }
+        """
         data = JSONParser().parse(request)
         # get rid of NULL values
         for key in data.keys():
             if data[key] is None:
                 data.pop(key)
-        # print(data)
-        # return Response(status=HTTP_200_OK)
         try: 
             q = MedicalRecord.objects.filter(**data).values()
         except MedicalRecord.DoesNotExist:
             return Response(status=HTTP_404_NOT_FOUND)
         else:
-            return_data = list(q)[0]
+            return_data = list(q)
             return_data.update({"record_num":len(return_data)})
-            print(return_data)
+            # print(return_data)
             return Response(data=return_data, status=HTTP_200_OK)
-            # return Response(status=HTTP_200_OK)
 
 
 
