@@ -1,3 +1,4 @@
+import json
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
 from rest_framework import viewsets
@@ -5,11 +6,12 @@ from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK
-from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo
-from .serializers import AccountSerializer, PISerializer, DISerializer, MISerializer
+from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND
+from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo, MedicalRecord
+from .serializers import AccountSerializer, PISerializer, DISerializer, MISerializer, MRSerializer
 from rest_framework.parsers import JSONParser
-from rest_framework.views import APIView
+from rest_framework.decorators import action
+# from rest_framework.views import APIView
 
 # Serve Vue Application
 index_view = never_cache(TemplateView.as_view(template_name='index.html'))
@@ -149,7 +151,7 @@ ModelViewSet
 
     II. path: PATH/<int:id> (e.g. localhost:8000/api/personal_info/3/)
         
-        Accept Methods: 'GET', 'PUT', 'DELETE' 
+        Accept Methods: 'GET', 'PUT', 'DELETE', 'PATCH'
 
         If request.method == 'GET':
             (Retrieve the record with the id)
@@ -185,6 +187,8 @@ ModelViewSet
             Response Status:
                 204: Deleted
                 404: Not Found
+        If request.method == 'PATCH':
+            (similar to PUT but it can do partial update)
 """
 
 class PIViewSet(viewsets.ModelViewSet):
@@ -209,4 +213,83 @@ class DIViewSet(viewsets.ModelViewSet):
     queryset = DepartmentInfo.objects.all()
     serializer_class = DISerializer
 
+class MRViewSet(viewsets.ModelViewSet):
+    """
+    PATH: http://127.0.0.1:8000/api/medical_record/
+    """
+    queryset = MedicalRecord.objects.all()
+    serializer_class = MRSerializer
 
+    @action(detail=False, methods=['POST'])
+    def filter_record(self, request):
+        """
+        PATH: http://127.0.0.1:8000/api/medical_record/filter_record/
+        Method: POST
+        Description: return the filtered record that satisfies the requested criteria.
+        Request JSON:
+            {
+                column1: condition1,
+                column2: condition2,
+                ...
+            }
+        Response JSON:
+            {
+                "record_num": 1,
+                "record_data": [
+                    {
+                        "recordID": 1,
+                        "date": "2020-11-26T15:00:00Z",
+                        "doctorID_id": 4,
+                        "patientID_id": 3,
+                        "patient_name": "Frank Zhou",
+                        doctor_name": "Boyan Xu",
+                    },
+                    {
+                        "recordID": 2,
+                        "date": "2020-11-26T15:00:00Z",
+                        "doctorID_id": 4,
+                        "patientID_id": 3,
+                        "patient_name": "Frank Zhou",
+                        "doctor_name": "Boyan Xu",
+                    },
+                    ...
+                ],
+            }
+        
+        """
+        data = JSONParser().parse(request)
+        # get rid of NULL values
+        for key in data.keys():
+            if data[key] is None:
+                data.pop(key)
+        try: 
+            q = MedicalRecord.objects.filter(**data).values()
+        except MedicalRecord.DoesNotExist:
+            return Response(status=HTTP_404_NOT_FOUND)
+        else:
+            record_data = list(q)
+            return_data = {"record_num":len(record_data), "record_data":[]}
+            for record in record_data:
+                date = record["date"]
+                patient_name = get_name(record["patient_id"])
+                doctor_name = get_name(record["doctor_id"])
+                recordID = record["recordID"]
+                return_data["record_data"].append({
+                    "recordID":recordID, "date":date,
+                    "patient_name":patient_name, "doctor_name":doctor_name,
+                    "patient_id":record["patient_id"], "doctor_id":record["doctor_id"],
+                    })
+            # print(return_data)
+            return Response(data=return_data, status=HTTP_200_OK)
+
+
+def get_name(id):
+    """
+    convert id to PersonalInfo.name
+    """
+    try:
+        info = PersonalInfo.objects.get(id=id)
+    except PersonalInfo.DoesNotExist:
+        return Response(status=HTTP_404_NOT_FOUND)
+    else:
+        return info.name

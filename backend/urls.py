@@ -7,9 +7,10 @@ from .api.views import index_view
 from .api import views
 
 router = routers.DefaultRouter()
-router.register('personal_information', views.PIViewSet)
-router.register('department_information', views.DIViewSet)
-router.register('medical_information', views.MIViewSet)
+router.register(r'personal_information', views.PIViewSet)
+router.register(r'department_information', views.DIViewSet)
+router.register(r'medical_information', views.MIViewSet)
+router.register(r'medical_record', views.MRViewSet)
 
 urlpatterns = [
 

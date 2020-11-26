@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.db.models.fields import related
 
 
 class Account(models.Model):
@@ -64,3 +65,16 @@ class DepartmentInfo(models.Model):
     supervisor = models.CharField(max_length=100)
     class Meta:
         db_table = 'dept_info'
+
+class MedicalRecord(models.Model):
+    recordID = models.IntegerField(primary_key=True)
+    patient = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='patient')
+    doctor = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='doctor')
+    date = models.DateTimeField(blank=False)
+    symptoms = models.CharField(max_length=300)
+    treatments = models.CharField(max_length=300)
+    diagnosis = models.CharField(max_length=300)
+    attachmentNb = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = 'medical_record'
