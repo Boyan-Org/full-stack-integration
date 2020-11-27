@@ -55,7 +55,7 @@ def login(request):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         else:
             id = account.id
-            data.update({"id": account.id})
+            data.update({"id": id})
             data.update({"role": account.role})
             personal_info = PersonalInfo.objects.get(id=id)
             data.update({"name": personal_info.name})
