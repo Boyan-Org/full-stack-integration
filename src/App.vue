@@ -1,26 +1,21 @@
 <template>
   <div id="app">
-    <router-view></router-view>
+    <div id="nav">
+     <router-link :to="{ name: 'home' }">Vue</router-link> |
+     <router-link :to="{ name: 'messages' }">Django Rest</router-link> |
+     <router-link :to="{ name: 'login' }">Login</router-link>
+    </div>
+    <router-view/>
   </div>
 </template>
 
-<script>
-import router from "./router";
-export default {
-  name: "App",
-  router,
-};
-</script>
-
-
 <style>
-html,
-body {
-  font-family: Helvetica, Arial, sans-serif;
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  margin: 0;
-  height: 100%;
-  overflow-y: hidden;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
 }
 </style>
