@@ -23,7 +23,8 @@ class PersonalInfo(models.Model):
     id = models.OneToOneField(
         Account,
         on_delete=models.CASCADE,
-        primary_key=True
+        primary_key=True,
+        db_column='id',
     )
     name = models.CharField(max_length=100, blank=False)
     gender = models.CharField(max_length=100)
@@ -43,7 +44,8 @@ class MedicalInfo(models.Model):
     id = models.OneToOneField(
         Account,
         on_delete=models.CASCADE,
-        primary_key=True
+        primary_key=True,
+        db_column='id',
     )
     height = models.IntegerField()
     weight = models.IntegerField()
@@ -59,7 +61,8 @@ class DepartmentInfo(models.Model):
     id = models.OneToOneField(
         Account,
         on_delete=models.CASCADE,
-        primary_key=True
+        primary_key=True,
+        db_column='id',
     )
     department = models.CharField(max_length=100)
     supervisor = models.CharField(max_length=100)
@@ -68,8 +71,8 @@ class DepartmentInfo(models.Model):
 
 class MedicalRecord(models.Model):
     recordID = models.IntegerField(primary_key=True)
-    patient = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='patient')
-    doctor = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='doctor')
+    patientID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patientID')
+    doctorID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctorID')
     date = models.DateTimeField(blank=False)
     symptoms = models.CharField(max_length=300)
     treatments = models.CharField(max_length=300)
@@ -78,3 +81,33 @@ class MedicalRecord(models.Model):
 
     class Meta:
         db_table = 'medical_record'
+
+class WorkingHour(models.Model):
+    id = models.OneToOneField(
+        Account,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        db_column='id',
+    )
+    monM = models.BooleanField(default=False)
+    monA = models.BooleanField(default=False)
+    tueM = models.BooleanField(default=False)
+    tueA = models.BooleanField(default=False)
+    wedM = models.BooleanField(default=False)
+    wedA = models.BooleanField(default=False)
+    thrM = models.BooleanField(default=False)
+    thrA = models.BooleanField(default=False)
+    friM = models.BooleanField(default=False)
+    friA = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'working_hour'
+
+class Appointment(models.Model):
+    appointmentID = models.IntegerField(primary_key=True)
+    patientID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patientID')
+    doctorID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctorID')
+    dateTime = models.DateTimeField(blank=False)
+
+    class Meta:
+        db_table = 'appointment'
