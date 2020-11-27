@@ -64,17 +64,10 @@ export default {
       this.$router.push("/login");
     },
     onSubmit(evt) {
-      // TODO: remove variable display;
-      console.warn("remove the display of form content");
-      console.log("username: " + this.form.username);
-      console.log("password: " + this.form.password);
-      console.log("confirm: " + this.confirmPassword);
-      console.log("name: " + this.form.name);
       if (this.form.username == "") {
         this.userError = "Please input a valid ID";
         return;
       } else {
-        //TODO: username already exist
         this.userError = "";
       }
       if (this.form.password == "") {
@@ -100,7 +93,6 @@ export default {
         return;
       }
       evt.preventDefault();
-      // alert(JSON.stringify(this.form));
 
       axios
         .post("api/register/", {
