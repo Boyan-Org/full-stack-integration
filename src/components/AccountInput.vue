@@ -12,21 +12,27 @@
 </template>
 
 <script>
+import router from "../router";
 export default {
-  data (){
+  data() {
     return {
       windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight
+      windowHeight: window.innerHeight,
+    };
+  },
+  created: function () {
+    if (sessionStorage.getItem("id") != null) {
+      router.push("/dashboard");
     }
   },
-  mounted () {
+  mounted() {
     window.onresize = () => {
       console.log("window resize");
       return (() => {
         this.windowWidth = window.innerWidth;
         this.windowHeight = window.innerHeight;
       })();
-    }
+    };
   },
   computed: {
     loginContainerPadding: function () {
