@@ -34,8 +34,7 @@ export default {
     if (sessionStorage.getItem("id") != null) {
       this.user.id = sessionStorage.getItem("id");
       this.user.name = sessionStorage.getItem("name");
-      // this.user.role = sessionStorage.getItem("role");
-      this.user.role = "patient";
+      this.user.role = sessionStorage.getItem("role");
       console.log(this.user);
     }
   },
