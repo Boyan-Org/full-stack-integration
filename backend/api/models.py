@@ -72,8 +72,8 @@ class DepartmentInfo(models.Model):
 
 class MedicalRecord(models.Model):
     recordID = models.AutoField(primary_key=True)
-    patientID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patientID')
-    doctorID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctorID')
+    patient = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patient_id')
+    doctor = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctor_id')
     date = models.DateTimeField(blank=False)
     symptoms = models.CharField(max_length=300)
     treatments = models.CharField(max_length=300)
@@ -86,9 +86,11 @@ class MedicalRecord(models.Model):
 
 class Appointment(models.Model):
     appointmentID = models.AutoField(primary_key=True)
-    patientID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patientID')
-    doctorID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctorID')
+    patient_id = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patient_id')
+    doctor_id = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctor_id')
     dateTime = models.DateTimeField(blank=False)
+    submitTime = models.DateTimeField(blank=False)
+
 
     class Meta:
         db_table = 'appointment'

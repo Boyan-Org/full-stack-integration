@@ -241,23 +241,23 @@ class MRViewSet(viewsets.ModelViewSet):
                     {
                         "recordID": 1,
                         "date": "2020-11-26T15:00:00Z",
-                        "doctorID_id": 4,
-                        "patientID_id": 3,
+                        "doctor_id": 4,
+                        "patient_id": 3,
                         "patient_name": "Frank Zhou",
                         doctor_name": "Boyan Xu",
                     },
                     {
                         "recordID": 2,
                         "date": "2020-11-26T15:00:00Z",
-                        "doctorID_id": 4,
-                        "patientID_id": 3,
+                        "doctor_id": 4,
+                        "patient_id": 3,
                         "patient_name": "Frank Zhou",
                         "doctor_name": "Boyan Xu",
                     },
                     ...
                 ],
             }
-        
+
         """
         data = JSONParser().parse(request)
         # get rid of NULL values
@@ -274,13 +274,13 @@ class MRViewSet(viewsets.ModelViewSet):
             for record in record_data:
                 date = record["date"]
                 print(record)
-                patient_name = get_name(record["patientID"])
-                doctor_name = get_name(record["doctorID"])
+                patient_name = get_name(record["patient_id"])
+                doctor_name = get_name(record["doctor_id"])
                 recordID = record["recordID"]
                 return_data["record_data"].append({
                     "recordID":recordID, "date":date,
                     "patientName":patient_name, "doctorName":doctor_name,
-                    "patientID":record["patientID"], "doctorID":record["doctorID"],
+                    "patient_id":record["patient_id"], "doctor_id":record["doctor_id"],
                     })
             # print(return_data)
             return Response(data=return_data, status=HTTP_200_OK)
@@ -306,11 +306,11 @@ class AppViewSet(viewsets.ModelViewSet):
         serializer = AppSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(data=request.data, status=status.HTTP_406_NOT_ACCEPTABLE)
-        doctorID = request.data['doctorID']
-        patientID = request.data['patientID']
+        doctor_id = request.data['doctor_id']
+        patient_id = request.data['patient_id']
         dateTime = request.data['dateTime']
-        workingHour = json.loads(DepartmentInfo.objects.get(id=doctorID).workingHour)
-        dateTime = datetime.datetime.strptime(dateTime, '%Y-%m-%dT%H:%M')
+        workingHour = json.loads(DepartmentInfo.objects.get(id=doctor_id).workingHour)
+        dateTime = datetime.datetime.strptime(dateTime, '%Y-%m-%dT%H:%M:%S')
         weekday = dateTime.weekday()
         time = 0 if dateTime.hour<12 else 1
 
@@ -322,7 +322,7 @@ class AppViewSet(viewsets.ModelViewSet):
             )
 
         # check whether too many patients in a slot (maximum 10)
-        appointments = Appointment.objects.filter(doctorID=doctorID, dateTime=dateTime)
+        appointments = Appointment.objects.filter(doctor_id=doctor_id, dateTime=dateTime)
         if len(list(appointments))>=10:
             return Response(
                     data={"error":"more than one appointment in a slot"},
@@ -330,7 +330,7 @@ class AppViewSet(viewsets.ModelViewSet):
                 )
 
         # check whether the patient has made an appointment with the doctor
-        appointments.filter(patientID=patientID)
+        appointments.filter(patient_id=patient_id)
         if len(list(appointments))!=0:
             return Response(
                     data={"error":"already booked in the slot"},
