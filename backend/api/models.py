@@ -66,13 +66,14 @@ class DepartmentInfo(models.Model):
     )
     department = models.CharField(max_length=100)
     supervisor = models.CharField(max_length=100)
+    workingHour = models.CharField(max_length=100)
     class Meta:
         db_table = 'dept_info'
 
 class MedicalRecord(models.Model):
-    recordID = models.IntegerField(primary_key=True)
-    patientID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patientID')
-    doctorID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctorID')
+    recordID = models.AutoField(primary_key=True)
+    patient = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patient_id')
+    doctor = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctor_id')
     date = models.DateTimeField(blank=False)
     symptoms = models.CharField(max_length=300)
     treatments = models.CharField(max_length=300)
@@ -82,32 +83,14 @@ class MedicalRecord(models.Model):
     class Meta:
         db_table = 'medical_record'
 
-class WorkingHour(models.Model):
-    id = models.OneToOneField(
-        Account,
-        on_delete=models.CASCADE,
-        primary_key=True,
-        db_column='id',
-    )
-    monM = models.BooleanField(default=False)
-    monA = models.BooleanField(default=False)
-    tueM = models.BooleanField(default=False)
-    tueA = models.BooleanField(default=False)
-    wedM = models.BooleanField(default=False)
-    wedA = models.BooleanField(default=False)
-    thrM = models.BooleanField(default=False)
-    thrA = models.BooleanField(default=False)
-    friM = models.BooleanField(default=False)
-    friA = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = 'working_hour'
 
 class Appointment(models.Model):
-    appointmentID = models.IntegerField(primary_key=True)
-    patientID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patientID')
-    doctorID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctorID')
+    appointmentID = models.AutoField(primary_key=True)
+    patient_id = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patient_id')
+    doctor_id = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctor_id')
     dateTime = models.DateTimeField(blank=False)
+    submitTime = models.DateTimeField(blank=False)
+
 
     class Meta:
         db_table = 'appointment'
