@@ -107,6 +107,22 @@ class Appointment(models.Model):
     appointmentID = models.IntegerField(primary_key=True)
     patientID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patientID')
     doctorID = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctorID')
+    # dateTime = models.CharField(
+    #     max_length=20,
+    #     blank=False,
+    #     choices=(
+    #         ('monM', 'monM'),
+    #         ('monA', 'monA'),
+    #         ('tueM', 'tueM'),
+    #         ('tueA', 'tueA'),
+    #         ('wedM', 'wedM'),
+    #         ('wedA', 'wedA'),
+    #         ('thrM', 'thrM'),
+    #         ('thrA', 'thrA'),
+    #         ('friM', 'friM'),
+    #         ('friA', 'friA'),
+    #     )
+    # )
     dateTime = models.DateTimeField(blank=False)
 
     class Meta:

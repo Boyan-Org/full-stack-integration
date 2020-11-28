@@ -7,8 +7,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND
-from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo, MedicalRecord
-from .serializers import AccountSerializer, PISerializer, DISerializer, MISerializer, MRSerializer
+from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo, MedicalRecord, WorkingHour, Appointment
+from .serializers import AccountSerializer, PISerializer, DISerializer, MISerializer, MRSerializer, WHSerializer, AppSerializer
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import action
 # from rest_framework.views import APIView
@@ -282,7 +282,56 @@ class MRViewSet(viewsets.ModelViewSet):
             # print(return_data)
             return Response(data=return_data, status=HTTP_200_OK)
 
+class WHViewSet(viewsets.ModelViewSet):
+    """
+    PATH: http://127.0.0.1:8000/api/working_hour/
+    """
+    queryset = WorkingHour.objects.all()
+    serializer_class = WHSerializer
 
+class AppViewSet(viewsets.ModelViewSet):
+    """
+    PATH: http://127.0.0.1:8000/api/appointment/
+    """
+    queryset = Appointment.objects.all()
+    serializer_class = AppSerializer
+
+    def create(self, request):
+        """
+        patient book appointment with a doctor.
+
+        Response status:
+            406: Data not acceptable
+            412: Doctor not available
+            201: Created
+
+        """
+        serializer = AppSerializer(data=request.data)
+        if serializer.is_valid():
+            doctorID = serializer.data['doctorID']
+            patientID = serializer.data['patientID']
+            dateTime = serializer.data['dateTime']
+            # check availability
+            workingHour = WorkingHour.objects.get(id=doctorID)
+            avail = WHSerializer(workingHour).data[dateTime]
+            if avail:
+                # check number of appointments in the slot
+                try:
+                    Appointment.objects.filter(doctorID=doctorID, patientID=patientID, dateTime=dateTime)
+                except Appointment.DoesNotExist:
+                    serializer.save()
+                    return Response(status=status.HTTP_201_CREATED)
+                else:
+                    return Response(data={"error":"more than one appointment in a slot"},
+                    )
+            else:
+                return Response(data={"error:":"doctor is not available"},
+                status=status.HTTP_412_PRECONDITION_FAILED)
+
+        else:
+            return Response(data=request.data, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+# Assistant Functions
 def get_name(id):
     """
     convert id to PersonalInfo.name
@@ -294,4 +343,7 @@ def get_name(id):
     else:
         return info.name
 
-
+def convert_dateTime_to_slot(dateTime):
+    convert_dic = {
+        
+    }
