@@ -1,4 +1,6 @@
 import json
+import datetime
+from django.utils.functional import empty
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
 from rest_framework import viewsets
@@ -7,8 +9,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND
-from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo, MedicalRecord, WorkingHour, Appointment
-from .serializers import AccountSerializer, PISerializer, DISerializer, MISerializer, MRSerializer, WHSerializer, AppSerializer
+from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo, MedicalRecord, Appointment
+from .serializers import AccountSerializer, PISerializer, DISerializer, MISerializer, MRSerializer, AppSerializer
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import action
 # from rest_framework.views import APIView
@@ -271,23 +273,18 @@ class MRViewSet(viewsets.ModelViewSet):
             return_data = {"record_num":len(record_data), "record_data":[]}
             for record in record_data:
                 date = record["date"]
-                patient_name = get_name(record["patient_id"])
-                doctor_name = get_name(record["doctor_id"])
+                print(record)
+                patient_name = get_name(record["patientID"])
+                doctor_name = get_name(record["doctorID"])
                 recordID = record["recordID"]
                 return_data["record_data"].append({
                     "recordID":recordID, "date":date,
-                    "patient_name":patient_name, "doctor_name":doctor_name,
-                    "patient_id":record["patient_id"], "doctor_id":record["doctor_id"],
+                    "patientName":patient_name, "doctorName":doctor_name,
+                    "patientID":record["patientID"], "doctorID":record["doctorID"],
                     })
             # print(return_data)
             return Response(data=return_data, status=HTTP_200_OK)
 
-class WHViewSet(viewsets.ModelViewSet):
-    """
-    PATH: http://127.0.0.1:8000/api/working_hour/
-    """
-    queryset = WorkingHour.objects.all()
-    serializer_class = WHSerializer
 
 class AppViewSet(viewsets.ModelViewSet):
     """
@@ -302,34 +299,53 @@ class AppViewSet(viewsets.ModelViewSet):
 
         Response status:
             406: Data not acceptable
-            412: Doctor not available
+            409: condition not satisfied (check response.data["error"])
             201: Created
 
         """
         serializer = AppSerializer(data=request.data)
-        if serializer.is_valid():
-            doctorID = serializer.data['doctorID']
-            patientID = serializer.data['patientID']
-            dateTime = serializer.data['dateTime']
-            # check availability
-            workingHour = WorkingHour.objects.get(id=doctorID)
-            avail = WHSerializer(workingHour).data[dateTime]
-            if avail:
-                # check number of appointments in the slot
-                try:
-                    Appointment.objects.filter(doctorID=doctorID, patientID=patientID, dateTime=dateTime)
-                except Appointment.DoesNotExist:
-                    serializer.save()
-                    return Response(status=status.HTTP_201_CREATED)
-                else:
-                    return Response(data={"error":"more than one appointment in a slot"},
-                    )
-            else:
-                return Response(data={"error:":"doctor is not available"},
-                status=status.HTTP_412_PRECONDITION_FAILED)
-
-        else:
+        if not serializer.is_valid():
             return Response(data=request.data, status=status.HTTP_406_NOT_ACCEPTABLE)
+        doctorID = request.data['doctorID']
+        patientID = request.data['patientID']
+        dateTime = request.data['dateTime']
+        workingHour = json.loads(DepartmentInfo.objects.get(id=doctorID).workingHour)
+        dateTime = datetime.datetime.strptime(dateTime, '%Y-%m-%dT%H:%M')
+        weekday = dateTime.weekday()
+        time = 0 if dateTime.hour<12 else 1
+
+        # check availability
+        if not workingHour[weekday][time]:
+            return Response(
+            data={"error:":"doctor is not available"},
+            status=status.HTTP_409_CONFLICT
+            )
+
+        # check whether too many patients in a slot (maximum 10)
+        appointments = Appointment.objects.filter(doctorID=doctorID, dateTime=dateTime)
+        if len(list(appointments))>=10:
+            return Response(
+                    data={"error":"more than one appointment in a slot"},
+                    status=status.HTTP_409_CONFLICT,
+                )
+
+        # check whether the patient has made an appointment with the doctor
+        appointments.filter(patientID=patientID)
+        if len(list(appointments))!=0:
+            return Response(
+                    data={"error":"already booked in the slot"},
+                    status=status.HTTP_409_CONFLICT,
+                )
+        # everything ok then create
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(data=request.data, status=status.HTTP_406_NOT_ACCEPTABLE)
+        
+        
+                
+
+            
 
 # Assistant Functions
 def get_name(id):
@@ -343,7 +359,3 @@ def get_name(id):
     else:
         return info.name
 
-def convert_dateTime_to_slot(dateTime):
-    convert_dic = {
-        
-    }

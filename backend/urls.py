@@ -11,8 +11,7 @@ router.register(r'personal_information', views.PIViewSet)
 router.register(r'department_information', views.DIViewSet)
 router.register(r'medical_information', views.MIViewSet)
 router.register(r'medical_record', views.MRViewSet)
-router.register(r'working_hour', views.WHViewSet)
-router.register(r'working_hour', views.AppViewSet)
+router.register(r'appointment', views.AppViewSet)
 
 urlpatterns = [
 

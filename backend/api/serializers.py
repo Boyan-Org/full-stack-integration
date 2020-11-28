@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo, MedicalRecord, WorkingHour, Appointment
+from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo, MedicalRecord, Appointment
 
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:
@@ -27,11 +27,7 @@ class MRSerializer(serializers.ModelSerializer):
     class Meta:
         model = MedicalRecord
         fields = '__all__'
-
-class WHSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = WorkingHour
-        fields = '__all__'
+        
 
 class AppSerializer(serializers.ModelSerializer):
     class Meta:
