@@ -7,8 +7,11 @@ import RegForm from "./components/RegForm.vue";
 import Dashboard from "./components/Dashboard"
 import AccountInput from "./components/AccountInput.vue";
 
+
 import InfoBoard from "./components/InfoBoard.vue";
 import DashInfo from "./components/DashInfo";
+
+import Appointment from "./components/Appointment.vue";
 
 Vue.use(Router)
 
@@ -55,6 +58,11 @@ export default new Router({
     {
       path: '/person', component: Dashboard, children: [
         { path: '', component: InfoBoard }
+      ]
+    },
+    {
+      path: '/appointment', component: Dashboard, children: [
+        { path: '', component: Appointment }
       ]
     },
     {
