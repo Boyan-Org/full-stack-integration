@@ -86,8 +86,8 @@ class MedicalRecord(models.Model):
 
 class Appointment(models.Model):
     appointmentID = models.AutoField(primary_key=True)
-    patient_id = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patient_id')
-    doctor_id = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctor_id')
+    patient = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patient_id')
+    doctor = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctor_id')
     dateTime = models.DateTimeField(blank=False)
     submitTime = models.DateTimeField(blank=False)
 

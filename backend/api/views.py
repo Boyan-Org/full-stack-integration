@@ -307,8 +307,8 @@ class AppViewSet(viewsets.ModelViewSet):
         serializer = AppSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(data=request.data, status=status.HTTP_406_NOT_ACCEPTABLE)
-        doctor_id = request.data['doctor_id']
-        patient_id = request.data['patient_id']
+        doctor_id = request.data['doctor']
+        patient_id = request.data['patient']
         dateTime = request.data['dateTime']
         workingHour = json.loads(DepartmentInfo.objects.get(id=doctor_id).workingHour)
         dateTime = datetime.datetime.strptime(dateTime, '%Y-%m-%dT%H:%M:%S')
