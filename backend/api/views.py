@@ -237,7 +237,7 @@ class MRViewSet(viewsets.ModelViewSet):
             }
         Response JSON:
             {
-                "record_num": 1,
+                "record_num": 2,
                 "record_data": [
                     {
                         "recordID": 1,
@@ -255,7 +255,6 @@ class MRViewSet(viewsets.ModelViewSet):
                         "patient_name": "Frank Zhou",
                         "doctor_name": "Boyan Xu",
                     },
-                    ...
                 ],
             }
 
@@ -271,19 +270,14 @@ class MRViewSet(viewsets.ModelViewSet):
             return Response(status=HTTP_404_NOT_FOUND)
         else:
             record_data = list(q)
-            return_data = {"record_num":len(record_data), "record_data":[]}
             for record in record_data:
-                date = record["date"]
-                print(record)
                 patient_name = get_name(record["patient_id"])
                 doctor_name = get_name(record["doctor_id"])
-                recordID = record["recordID"]
-                return_data["record_data"].append({
-                    "recordID":recordID, "date":date,
-                    "patientName":patient_name, "doctorName":doctor_name,
-                    "patient_id":record["patient_id"], "doctor_id":record["doctor_id"],
-                    })
-            # print(return_data)
+                record.update({
+                    "patient_name":patient_name,
+                    "doctor_name":doctor_name,
+                })
+            return_data = {"record_num":len(record_data), "record_data":record_data}
             return Response(data=return_data, status=HTTP_200_OK)
 
 
@@ -342,7 +336,55 @@ class AppViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(status=status.HTTP_201_CREATED)
         return Response(data=request.data, status=status.HTTP_406_NOT_ACCEPTABLE)
-        
+
+    @action(detail=False, methods=['POST'])
+    def filter_appointment(self, request):
+        """
+        PATH: http://127.0.0.1:8000/api/appointment/filter_appointment/
+        Method: POST
+        Description: return the filtered appointment that satisfies the requested criteria.
+        Request JSON:
+            {
+                column1: condition1,
+                column2: condition2,
+                ...
+            }
+        Response JSON:
+            {
+                "record_num": 2,
+                "record_data": [
+                    {
+                        "appointmentID": 1,
+                        "dateTime": "2020-11-29T14:00:00",
+                        "department": "dept1",
+                        "doctor_id": 2,
+                        "patient_id": 1,
+                        "submitTime": "2020-11-28T22:00:00"
+                    },
+                    {
+                        "appointmentID": 2,
+                        "dateTime": "2020-11-30T14:00:00",
+                        "department": "dept1",
+                        "doctor_id": 2,
+                        "patient_id": 1,
+                        "submitTime": "2020-11-28T22:00:00"
+                    }
+                ],
+            }
+        """
+        data = JSONParser().parse(request)
+        # get rid of NULL values
+        for key in data.keys():
+            if data[key] is None:
+                data.pop(key)
+        q = Appointment.objects.filter(**data).values()
+        record_data = list(q)
+        for record in record_data:
+            dept = get_department(record["doctor_id"])
+            record.update({"department":dept})
+        return_data = {"record_num":len(record_data), "record_data":record_data}
+        return Response(data=return_data, status=HTTP_200_OK)
+
         
                 
 
@@ -359,4 +401,15 @@ def get_name(id):
         return Response(status=HTTP_404_NOT_FOUND)
     else:
         return info.name
+
+def get_department(id):
+    """
+    convert id to DepartmentInfo.department
+    """
+    try:
+        info = DepartmentInfo.objects.get(id=id)
+    except DepartmentInfo.DoesNotExist:
+        return Response(status=HTTP_404_NOT_FOUND)
+    else:
+        return info.department
 

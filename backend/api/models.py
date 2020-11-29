@@ -74,7 +74,7 @@ class MedicalRecord(models.Model):
     recordID = models.AutoField(primary_key=True)
     patient = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patient_id')
     doctor = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctor_id')
-    date = models.DateTimeField(blank=False)
+    dateTime = models.DateTimeField(blank=False)
     symptoms = models.CharField(max_length=300)
     treatments = models.CharField(max_length=300)
     diagnosis = models.CharField(max_length=300)
