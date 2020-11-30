@@ -1,4 +1,6 @@
 import json
+import datetime
+from django.utils.functional import empty
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
 from rest_framework import viewsets
@@ -7,8 +9,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND
-from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo, MedicalRecord
-from .serializers import AccountSerializer, PISerializer, DISerializer, MISerializer, MRSerializer
+from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo, MedicalRecord, Appointment
+from .serializers import AccountSerializer, PISerializer, DISerializer, MISerializer, MRSerializer, AppSerializer
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import action
 # from rest_framework.views import APIView
@@ -55,7 +57,7 @@ def login(request):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         else:
             id = account.id
-            data.update({"id": account.id})
+            data.update({"id": id})
             data.update({"role": account.role})
             personal_info = PersonalInfo.objects.get(id=id)
             data.update({"name": personal_info.name})
@@ -235,28 +237,27 @@ class MRViewSet(viewsets.ModelViewSet):
             }
         Response JSON:
             {
-                "record_num": 1,
+                "record_num": 2,
                 "record_data": [
                     {
                         "recordID": 1,
                         "date": "2020-11-26T15:00:00Z",
-                        "doctorID_id": 4,
-                        "patientID_id": 3,
+                        "doctor_id": 4,
+                        "patient_id": 3,
                         "patient_name": "Frank Zhou",
                         doctor_name": "Boyan Xu",
                     },
                     {
                         "recordID": 2,
                         "date": "2020-11-26T15:00:00Z",
-                        "doctorID_id": 4,
-                        "patientID_id": 3,
+                        "doctor_id": 4,
+                        "patient_id": 3,
                         "patient_name": "Frank Zhou",
                         "doctor_name": "Boyan Xu",
                     },
-                    ...
                 ],
             }
-        
+
         """
         data = JSONParser().parse(request)
         # get rid of NULL values
@@ -269,21 +270,127 @@ class MRViewSet(viewsets.ModelViewSet):
             return Response(status=HTTP_404_NOT_FOUND)
         else:
             record_data = list(q)
-            return_data = {"record_num":len(record_data), "record_data":[]}
             for record in record_data:
-                date = record["date"]
                 patient_name = get_name(record["patient_id"])
                 doctor_name = get_name(record["doctor_id"])
-                recordID = record["recordID"]
-                return_data["record_data"].append({
-                    "recordID":recordID, "date":date,
-                    "patient_name":patient_name, "doctor_name":doctor_name,
-                    "patient_id":record["patient_id"], "doctor_id":record["doctor_id"],
-                    })
-            # print(return_data)
+                record.update({
+                    "patient_name":patient_name,
+                    "doctor_name":doctor_name,
+                })
+            return_data = {"record_num":len(record_data), "record_data":record_data}
             return Response(data=return_data, status=HTTP_200_OK)
 
 
+class AppViewSet(viewsets.ModelViewSet):
+    """
+    PATH: http://127.0.0.1:8000/api/appointment/
+    """
+    queryset = Appointment.objects.all()
+    serializer_class = AppSerializer
+
+    def create(self, request):
+        """
+        patient book appointment with a doctor.
+
+        Response status:
+            406: Data not acceptable
+            409: condition not satisfied (check response.data["error"])
+            201: Created
+
+        """
+        serializer = AppSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(data=request.data, status=status.HTTP_406_NOT_ACCEPTABLE)
+        doctor_id = request.data['doctor']
+        patient_id = request.data['patient']
+        dateTime = request.data['dateTime']
+        workingHour = json.loads(DepartmentInfo.objects.get(id=doctor_id).workingHour)
+        dateTime = datetime.datetime.strptime(dateTime, '%Y-%m-%dT%H:%M:%S')
+        weekday = dateTime.weekday()
+        time = 0 if dateTime.hour<12 else 1
+
+        # check availability
+        if not workingHour[weekday][time]:
+            return Response(
+            data={"error:":"doctor is not available"},
+            status=status.HTTP_409_CONFLICT
+            )
+
+        # check whether too many patients in a slot (maximum 10)
+        appointments = Appointment.objects.filter(doctor_id=doctor_id, dateTime=dateTime)
+        if len(list(appointments))>=10:
+            return Response(
+                    data={"error":"more than one appointment in a slot"},
+                    status=status.HTTP_409_CONFLICT,
+                )
+
+        # check whether the patient has made an appointment with the doctor
+        appointments.filter(patient_id=patient_id)
+        if len(list(appointments))!=0:
+            return Response(
+                    data={"error":"already booked in the slot"},
+                    status=status.HTTP_409_CONFLICT,
+                )
+        # everything ok then create
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(data=request.data, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+    @action(detail=False, methods=['POST'])
+    def filter_appointment(self, request):
+        """
+        PATH: http://127.0.0.1:8000/api/appointment/filter_appointment/
+        Method: POST
+        Description: return the filtered appointment that satisfies the requested criteria.
+        Request JSON:
+            {
+                column1: condition1,
+                column2: condition2,
+                ...
+            }
+        Response JSON:
+            {
+                "record_num": 2,
+                "record_data": [
+                    {
+                        "appointmentID": 1,
+                        "dateTime": "2020-11-29T14:00:00",
+                        "department": "dept1",
+                        "doctor_id": 2,
+                        "patient_id": 1,
+                        "submitTime": "2020-11-28T22:00:00"
+                    },
+                    {
+                        "appointmentID": 2,
+                        "dateTime": "2020-11-30T14:00:00",
+                        "department": "dept1",
+                        "doctor_id": 2,
+                        "patient_id": 1,
+                        "submitTime": "2020-11-28T22:00:00"
+                    }
+                ],
+            }
+        """
+        data = JSONParser().parse(request)
+        # get rid of NULL values
+        for key in data.keys():
+            if data[key] is None:
+                data.pop(key)
+        q = Appointment.objects.filter(**data).values()
+        record_data = list(q)
+        for record in record_data:
+            dept = get_department(record["doctor_id"])
+            record.update({"department":dept})
+        return_data = {"record_num":len(record_data), "record_data":record_data}
+        return Response(data=return_data, status=HTTP_200_OK)
+
+        
+                
+
+            
+
+# Assistant Functions
 def get_name(id):
     """
     convert id to PersonalInfo.name
@@ -295,4 +402,14 @@ def get_name(id):
     else:
         return info.name
 
+def get_department(id):
+    """
+    convert id to DepartmentInfo.department
+    """
+    try:
+        info = DepartmentInfo.objects.get(id=id)
+    except DepartmentInfo.DoesNotExist:
+        return Response(status=HTTP_404_NOT_FOUND)
+    else:
+        return info.department
 
