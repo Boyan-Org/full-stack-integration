@@ -195,7 +195,4 @@ export default {
 </script>
 
 <style scoped>
-.recordFilter {
-  /* padding-left: 5%; */
-}
 </style>
