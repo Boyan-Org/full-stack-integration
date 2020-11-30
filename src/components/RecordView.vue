@@ -36,9 +36,9 @@
             {{ treat }}
           </dd>
         </dl>
-
       </div>
       <pdf v-else :src="pdfSrc"></pdf>
+      <!-- <iframe :src="pdfSrc" width="100%" height="900px"></iframe> -->
     </el-card>
 
     <div class="paging">
@@ -86,20 +86,24 @@
 
 <script>
 import pdf from "vue-pdf";
-import router from '../router';
+import router from "../router";
 export default {
   data() {
     return {
+      recordId: 0,
       patientName: "",
       patientDOB: Date.now(),
       patientGender: "",
       doctorName: "",
       dept: "",
       recordTime: Date.now(),
-      page: 1,
+
       sym: "Chief Complaint",
       diag: "The disease is",
       treat: "The medication",
+
+      page: 1,
+
       modify: false,
       current: 1,
       pdfSrc: "../../static/dummy.pdf",
