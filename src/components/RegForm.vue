@@ -6,10 +6,21 @@
           <el-input v-model="form.username"></el-input>
         </el-form-item>
         <el-form-item label="Password" :error="ruleError" required="">
+          <el-popover ref="popover" placement="top" width="310" trigger="focus" title="The password must">
+            <dl>
+              • Contain all of the 4 following character classes:
+              <dd>o Lower case characters</dd>
+              <dd>o Upper case characters</dd>
+              <dd>o Numbers</dd>
+              <dd>o "Special" characters</dd>
+              • Contain at least eight alphanumeric characters.
+            </dl>
+          </el-popover>
           <el-input
             placeholder="Enter Password"
             v-model="form.password"
             show-password
+            v-popover:popover
           ></el-input>
         </el-form-item>
         <el-form-item :error="confirmError" required="">
