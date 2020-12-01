@@ -237,25 +237,16 @@ class MRViewSet(viewsets.ModelViewSet):
             }
         Response JSON:
             {
-                "record_num": 2,
                 "record_data": [
                     {
-                        "recordID": 1,
-                        "date": "2020-11-26T15:00:00Z",
-                        "doctor_id": 4,
-                        "patient_id": 3,
-                        "patient_name": "Frank Zhou",
-                        doctor_name": "Boyan Xu",
-                    },
-                    {
-                        "recordID": 2,
-                        "date": "2020-11-26T15:00:00Z",
-                        "doctor_id": 4,
-                        "patient_id": 3,
-                        "patient_name": "Frank Zhou",
+                        "dateTime": "2020-11-29T00:17:34",
+                        "department": "dept1",
                         "doctor_name": "Boyan Xu",
-                    },
+                        "patient_name": "Frank Zhou",
+                        "recordID": 1
+                    }
                 ],
+                "record_num": 1
             }
 
         """
@@ -273,9 +264,17 @@ class MRViewSet(viewsets.ModelViewSet):
             for record in record_data:
                 patient_name = get_name(record["patient_id"])
                 doctor_name = get_name(record["doctor_id"])
+                department = get_department(record["doctor_id"])
+                record.pop("patient_id")
+                record.pop("doctor_id")
+                record.pop("symptoms")
+                record.pop("treatments")
+                record.pop("diagnosis")
+                record.pop("attachmentNb")
                 record.update({
                     "patient_name":patient_name,
                     "doctor_name":doctor_name,
+                    "department": department,
                 })
             return_data = {"record_num":len(record_data), "record_data":record_data}
             return Response(data=return_data, status=HTTP_200_OK)
