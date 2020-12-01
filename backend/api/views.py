@@ -225,6 +225,26 @@ class MRViewSet(viewsets.ModelViewSet):
     serializer_class = MRSerializer
 
     def retrieve(self, request, pk=None):
+        """
+        Modified ModelViewSet.retrieve()
+        Response Json:
+            {
+                "attachmentNb": 0,
+                "dateTime": "2020-11-29T00:17:34",
+                "department": "dept1",
+                "diagnosis": "d",
+                "doctor_id": 2,
+                "doctor_name": "Boyan Xu",
+                "flag": false,
+                "patient_birthday": "",
+                "patient_gender": "",
+                "patient_id": 1,
+                "patient_name": "Frank Zhou",
+                "recordID": 1,
+                "symptoms": "s",
+                "treatments": "t"
+            }
+        """
         queryset = MedicalRecord.objects.filter(pk=pk).values()
         record_data = list(queryset)
         if len(record_data)==0:
