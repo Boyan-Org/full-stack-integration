@@ -13,6 +13,7 @@ from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo, MedicalR
 from .serializers import AccountSerializer, PISerializer, DISerializer, MISerializer, MRSerializer, AppSerializer
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import action
+from django.shortcuts import get_object_or_404
 # from rest_framework.views import APIView
 
 # Serve Vue Application
@@ -223,6 +224,28 @@ class MRViewSet(viewsets.ModelViewSet):
     queryset = MedicalRecord.objects.all()
     serializer_class = MRSerializer
 
+    def retrieve(self, request, pk=None):
+        queryset = MedicalRecord.objects.filter(pk=pk).values()
+        record_data = list(queryset)
+        if len(record_data)==0:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            record = record_data[0]
+            patient_name = get_person_info(record["patient_id"]).name
+            doctor_name = get_person_info(record["doctor_id"]).name
+            department = get_department(record["doctor_id"]).department
+            patient_gender = get_person_info(record["patient_id"]).gender
+            patient_birthday = get_person_info(record["patient_id"]).dateOfBirth
+            record.update({
+                "patient_name":patient_name,
+                "doctor_name":doctor_name,
+                "department":department,
+                "patient_gender":patient_gender,
+                "patient_birthday":patient_birthday,
+            })
+            return Response(data=record, status=HTTP_200_OK)
+
+
     @action(detail=False, methods=['POST'])
     def filter_record(self, request):
         """
@@ -237,25 +260,16 @@ class MRViewSet(viewsets.ModelViewSet):
             }
         Response JSON:
             {
-                "record_num": 2,
                 "record_data": [
                     {
-                        "recordID": 1,
-                        "date": "2020-11-26T15:00:00Z",
-                        "doctor_id": 4,
-                        "patient_id": 3,
-                        "patient_name": "Frank Zhou",
-                        doctor_name": "Boyan Xu",
-                    },
-                    {
-                        "recordID": 2,
-                        "date": "2020-11-26T15:00:00Z",
-                        "doctor_id": 4,
-                        "patient_id": 3,
-                        "patient_name": "Frank Zhou",
+                        "dateTime": "2020-11-29T00:17:34",
+                        "department": "dept1",
                         "doctor_name": "Boyan Xu",
-                    },
+                        "patient_name": "Frank Zhou",
+                        "recordID": 1
+                    }
                 ],
+                "record_num": 1
             }
 
         """
@@ -264,21 +278,27 @@ class MRViewSet(viewsets.ModelViewSet):
         for key in data.keys():
             if data[key] is None:
                 data.pop(key)
-        try: 
-            q = MedicalRecord.objects.filter(**data).values()
-        except MedicalRecord.DoesNotExist:
-            return Response(status=HTTP_404_NOT_FOUND)
-        else:
-            record_data = list(q)
-            for record in record_data:
-                patient_name = get_name(record["patient_id"])
-                doctor_name = get_name(record["doctor_id"])
-                record.update({
-                    "patient_name":patient_name,
-                    "doctor_name":doctor_name,
-                })
-            return_data = {"record_num":len(record_data), "record_data":record_data}
-            return Response(data=return_data, status=HTTP_200_OK)
+
+        q = MedicalRecord.objects.filter(**data).values()
+        record_data = list(q)
+        for record in record_data:
+            patient_name = get_person_info(record["patient_id"]).name
+            doctor_name = get_person_info(record["doctor_id"]).name
+            department = get_department(record["doctor_id"]).department
+            record.pop("patient_id")
+            record.pop("doctor_id")
+            record.pop("symptoms")
+            record.pop("treatments")
+            record.pop("diagnosis")
+            record.pop("attachmentNb")
+            record.pop("flag")
+            record.update({
+                "patient_name":patient_name,
+                "doctor_name":doctor_name,
+                "department": department,
+            })
+        return_data = {"record_num":len(record_data), "record_data":record_data}
+        return Response(data=return_data, status=HTTP_200_OK)
 
 
 class AppViewSet(viewsets.ModelViewSet):
@@ -380,7 +400,7 @@ class AppViewSet(viewsets.ModelViewSet):
         q = Appointment.objects.filter(**data).values()
         record_data = list(q)
         for record in record_data:
-            dept = get_department(record["doctor_id"])
+            dept = get_department(record["doctor_id"]).department
             record.update({"department":dept})
         return_data = {"record_num":len(record_data), "record_data":record_data}
         return Response(data=return_data, status=HTTP_200_OK)
@@ -391,7 +411,7 @@ class AppViewSet(viewsets.ModelViewSet):
             
 
 # Assistant Functions
-def get_name(id):
+def get_person_info(id):
     """
     convert id to PersonalInfo.name
     """
@@ -400,7 +420,7 @@ def get_name(id):
     except PersonalInfo.DoesNotExist:
         return Response(status=HTTP_404_NOT_FOUND)
     else:
-        return info.name
+        return info
 
 def get_department(id):
     """
@@ -411,5 +431,5 @@ def get_department(id):
     except DepartmentInfo.DoesNotExist:
         return Response(status=HTTP_404_NOT_FOUND)
     else:
-        return info.department
+        return info
 

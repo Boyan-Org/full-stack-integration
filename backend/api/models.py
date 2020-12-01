@@ -64,9 +64,9 @@ class DepartmentInfo(models.Model):
         primary_key=True,
         db_column='id',
     )
-    department = models.CharField(max_length=100)
+    department = models.CharField(max_length=100, blank=False)
     supervisor = models.CharField(max_length=100)
-    workingHour = models.CharField(max_length=100)
+    workingHour = models.CharField(max_length=100, blank=False)
     class Meta:
         db_table = 'dept_info'
 
@@ -79,6 +79,7 @@ class MedicalRecord(models.Model):
     treatments = models.CharField(max_length=300)
     diagnosis = models.CharField(max_length=300)
     attachmentNb = models.IntegerField(default=0)
+    flag = models.BooleanField(blank=False)
 
     class Meta:
         db_table = 'medical_record'
