@@ -14,7 +14,8 @@
           <th class="headerEntry">Doctor: {{ doctorName }}</th>
           <th class="headerEntry">Department: {{ dept }}</th>
           <th class="headerEntry">
-            Date: {{ Intl.DateTimeFormat("zh-CN").format(recordTime) }}
+            Time:
+            {{ Intl.DateTimeFormat("zh-CN", timeOption).format(recordTime) }}
           </th>
         </tr>
       </table>
@@ -47,7 +48,7 @@
         :hide-on-single-page="true"
         layout="prev, pager, next"
         :page-size="1"
-        :total="2"
+        :total="totalPage"
         :current-page="1"
         @current-change="pageChange"
       ></el-pagination>
@@ -87,10 +88,11 @@
 <script>
 import pdf from "vue-pdf";
 import router from "../router";
+import axios from "axios";
 export default {
   data() {
     return {
-      recordId: 0,
+      recordID: 0,
       patientName: "",
       patientDOB: Date.now(),
       patientGender: "",
@@ -98,15 +100,25 @@ export default {
       dept: "",
       recordTime: Date.now(),
 
-      sym: "Chief Complaint",
-      diag: "The disease is",
-      treat: "The medication",
+      sym: "",
+      diag: "",
+      treat: "",
 
       page: 1,
+      totalPage: 1,
 
       modify: false,
       current: 1,
       pdfSrc: "../../static/dummy.pdf",
+      timeOption: {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+        hour12: false,
+      },
     };
   },
   components: {
@@ -120,6 +132,50 @@ export default {
       var ageDate = new Date(ageDifMs); // miliseconds from epoch
       return Math.abs(ageDate.getUTCFullYear() - 1970);
     },
+  },
+  mounted() {
+    this.recordID = this.$route.params.id;
+    axios
+      .get("../api/medical_record/" + this.recordID, {
+        recordID: this.recordID,
+      })
+      .then((resp) => {
+        // "attachmentNb": 0,
+        // "dateTime": "2020-11-29T00:17:34",
+        // "department": "dept1",
+        // "diagnosis": "d",
+        // "doctor_id": 2,
+        // "doctor_name": "Boyan Xu",
+        // "flag": false,
+        // "patient_birthday": "",
+        // "patient_gender": "",
+        // "patient_id": 1,
+        // "patient_name": "Frank Zhou",
+        // "recordID": 1,
+        // "symptoms": "s",
+        // "treatments": "t"
+        console.log(resp);
+        var rData = resp.data;
+        console.log(rData);
+        this.patientName = rData.patient_name;
+        this.doctorName = rData.doctor_name;
+        this.sym = rData.symptoms;
+        this.treat = rData.treatments;
+        this.diag = rData.diagnosis;
+        this.dept = rData.department;
+        this.patientDOB = Date.parse(rData.patient_birthday);
+        this.patientGender = rData.patient_gender;
+        this.recordTime = Date.parse(rData.dateTime);
+        this.totalPage = rData.attachmentNb + 1;
+      })
+      .catch((error) => {
+        //error handling
+        console.log(error);
+        var loginCode = error.response.status;
+        if (loginCode == 404) {
+          this.$message.error("Record does not exist!");
+        }
+      });
   },
   methods: {
     goBack() {

@@ -15,7 +15,6 @@
               class="inline-input"
               v-model="form.doctor"
               :fetch-suggestions="queryDoc"
-              @select="handleSelectDoc"
               :disabled="doctorInput"
             ></el-autocomplete>
           </el-form-item>
@@ -28,7 +27,6 @@
               class="inline-input"
               v-model="form.patient"
               :fetch-suggestions="queryPat"
-              @select="handleSelectPat"
               :disabled="patientInput"
             ></el-autocomplete>
           </el-form-item>
@@ -75,19 +73,38 @@
       style="width: 100%"
       :default-sort="{ prop: 'date', order: 'descending' }"
       @row-click="enterRecord"
+      height="530px"
     >
-      <el-table-column prop="doctor" label="Doctor" width="180" sortable>
+      <el-table-column prop="doctor_name" label="Doctor" width="180" sortable>
       </el-table-column>
-      <el-table-column prop="dept" label="Department" width="180" sortable>
+      <el-table-column
+        prop="department"
+        label="Department"
+        width="180"
+        sortable
+      >
       </el-table-column>
-      <el-table-column prop="patient" label="Patient" sortable>
+      <el-table-column prop="patient_name" label="Patient" sortable>
       </el-table-column>
-      <el-table-column prop="date" label="Date" sortable> </el-table-column>
+      <el-table-column prop="dateTime" label="Time" sortable>
+        <template slot-scope="scope">
+          <!-- <span style="margin-left: 10px">{{
+            Intl.DateTimeFormat("zh-CN", timeOption).format(
+              Date.parse(scope.row.dateTime)
+            )
+          }}</span> -->
+          <span style="margin-left: 10px">{{
+            Intl.DateTimeFormat("zh-CN", timeOption).format(scope.row.dateTime)
+          }}</span>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+import router from "../router";
 export default {
   data() {
     return {
@@ -102,30 +119,27 @@ export default {
         from: Date.now(),
         to: Date.now(),
       },
-      doctors: [{ value: "三全鲜食（北新泾店）", id: "123" }],
-      patients: [
-        { value: "Hot honey 首尔炸鸡（仙霞路）", id: "456" },
-        { value: "新旺角茶餐厅", id: "789" },
-      ],
-      depts: [{ value: "泷千家(天山西路店)", id: "111112" }],
+      doctors: [],
+      doctors_id: [],
+      patients: [],
+      patients_id: [],
+      depts: [],
+      allDepts: [],
+
       doctorInput: false,
       patientInput: false,
-      recordEntry: [
-        {
-          doctor: "doc1",
-          dept: "dept1",
-          patient: "pat1",
-          date: "2016-05-02",
-          id:"1"
-        },
-        {
-          doctor: "doc2",
-          dept: "dept2",
-          patient: "pat2",
-          date: "2016-05-03",
-          id:"2"
-        },
-      ],
+      recordEntry: [],
+      allEntry: [],
+      totalRecord: 0,
+      timeOption: {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+        hour12: false,
+      },
     };
   },
   created() {
@@ -134,9 +148,6 @@ export default {
       this.user.name = sessionStorage.getItem("name");
       this.user.role = sessionStorage.getItem("role");
     }
-  },
-  mounted() {
-    //TODO: load doctor, department, patients
     if (this.user.role == "patient") {
       this.form.patientId = this.user.id;
       this.form.patient = this.user.name;
@@ -147,11 +158,20 @@ export default {
       this.form.doctor = this.user.name;
       this.doctorInput = true;
     }
+    this.requestEntry();
   },
+  mounted() {},
   methods: {
     onSubmit() {
-      this.form.from = this.value[0];
-      this.form.to = this.value[1];
+      if (this.value) {
+        this.form.from = this.value[0];
+        this.form.to = this.value[1];
+      } else {
+        this.form.from = undefined;
+        this.form.to = undefined;
+      }
+      // console.log(this.form);
+      this.filterEntry();
     },
     queryDoc(queryString, cb) {
       var list = this.doctors;
@@ -181,15 +201,105 @@ export default {
         );
       };
     },
-    handleSelectDoc(item) {
-      this.form.doctorId = item.id;
+    // handleSelectDoc(item) {
+    //   this.form.doctorId = item.id;
+    // },
+    // handleSelectPat(item) {
+    //   this.form.patientId = item.id;
+    // },
+    enterRecord(item) {
+      // console.log(item.recordID);
+      router.push("record/" + item.recordID);
     },
-    handleSelectPat(item) {
-      this.form.patientId = item.id;
+    requestEntry() {
+      var params = {};
+      if (this.form.doctorId != "") {
+        params.doctor_id = this.form.doctorId;
+      }
+      if (this.form.patientId != "") {
+        params.patient_id = this.form.patientId;
+      }
+      // if (this.form.dept != "") {
+      //   params.dept = this.form.dept;
+      // }
+      // if (this.form.date != "") {
+      //   params.date = this.form.date;
+      // }
+      axios
+        .post("api/medical_record/filter_record/", params)
+        .then((resp) => {
+          console.log(resp);
+          this.totalRecord = resp.data.record_num;
+          // this.recordEntry = resp.data.record_data;
+          // this.allEntry = resp.data.record_data;
+          for (let i = 0; i < this.totalRecord; i++) {
+            const element = resp.data.record_data[i];
+            this.recordEntry.push({
+              doctor_name: element.doctor_name,
+              // doctor_id: element.doctor_id,
+              patient_name: element.patient_name,
+              // patients_id: element.patients_id,
+              recordID: element.recordID,
+              department: element.department,
+              dateTime: Date.parse(element.dateTime),
+            });
+            this.allEntry.push({
+              doctor_name: element.doctor_name,
+              // doctor_id: element.doctor_id,
+              patient_name: element.patient_name,
+              // patients_id: element.patients_id,
+              recordID: element.recordID,
+              department: element.department,
+              dateTime: Date.parse(element.dateTime),
+            });
+            if (this.doctors_id.indexOf(element.doctor_name) == -1) {
+              this.doctors_id.push(element.doctor_name);
+              this.doctors.push({ value: element.doctor_name });
+            }
+
+            if (this.patients_id.indexOf(element.patient_name) == -1) {
+              this.patients_id.push(element.patient_name);
+              this.patients.push({ value: element.patient_name });
+            }
+
+            if (this.allDepts.indexOf(element.department) == -1) {
+              this.allDepts.push(element.department);
+              this.depts.push({ value: element.department });
+            }
+          }
+        })
+        .catch((error) => {
+          //error handling
+          console.log(error.response.status);
+          // var loginCode = error.response.status;
+        });
     },
-    enterRecord(item){
-        console.log(item.id);
-    }
+    filterEntry() {
+      var entry = [];
+      for (let i = 0; i < this.totalRecord; i++) {
+        var flag = true;
+        var element = this.allEntry[i];
+        if (this.form.doctor && this.form.doctor != element.doctor_name) {
+          flag = false;
+        }
+        if (this.form.patient && this.form.patient != element.patient_name) {
+          flag = false;
+        }
+        if (this.form.dept && this.form.dept != element.department) {
+          flag = false;
+        }
+        if (
+          this.form.from &&
+          (this.form.from > element.dateTime || this.form.to < element.dateTime)
+        ) {
+          flag = false;
+        }
+        if (flag) {
+          entry.push(element);
+        }
+      }
+      this.recordEntry = entry;
+    },
   },
 };
 </script>
