@@ -69,7 +69,15 @@ export default {
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
-  background-image: url("../assets/login-hero-crop.jpg");
+  background-image: 
+  linear-gradient(
+      225deg,
+      rgb(4, 0, 87) 0%,
+      rgba(48, 7, 105, 0.603) 30%,
+      rgba(9, 9, 121, 0.479) 44%,
+      rgb(0, 195, 234) 100%
+    ),
+    url("../assets/hero-bk-1.jpg");
   background-size: cover;
   text-align: center;
 }
