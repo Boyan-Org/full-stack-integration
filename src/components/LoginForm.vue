@@ -87,22 +87,6 @@ export default {
           // TODO: remove response content
           var userData = resp.data;
           console.log(userData);
-          // if user does not exist
-          // if (resp.error == 404) {
-          //   this.loginError = "User does not exist";
-          //   this.onReset;
-          // }
-          // // if wrong password
-          // if (resp.error == 401) {
-          //   this.loginError = "Invalid password";
-          //   // cleer password to re-enter
-          //   this.form.password = "";
-          //   // clear other settings for the next tick
-          //   this.show = false;
-          //   this.$nextTick(() => {
-          //     this.show = true;
-          //   });
-          // }
           // if no problem, save it in the cookie and jump to Dashboard
           if (userData.username === this.form.username) {
             var storage = sessionStorage;
