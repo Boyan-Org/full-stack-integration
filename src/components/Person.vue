@@ -37,7 +37,6 @@
           >
             <el-input v-model="age"></el-input>
           </el-tooltip>
-          
         </el-form-item>
       </el-col>
     </el-row>
@@ -60,9 +59,6 @@
         <el-option label="Widowed" value="Widowed"></el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="Job">
-      <el-input v-model="form.job"></el-input>
-    </el-form-item>
 
     <el-form-item>
       <el-button type="primary" @click="submitForm()">Save</el-button>
@@ -71,9 +67,11 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
+      id: sessionStorage.getItem("id"),
       form: {
         name: "",
         gender: "",
@@ -82,9 +80,40 @@ export default {
         phone: "",
         addr: "",
         marital: "",
-        job: "",
       },
     };
+  },
+  mounted() {
+    axios
+      .get("../api/personal_information/" + this.id)
+      .then((resp) => {
+        console.log(resp.data);
+        // address: "";
+        // dateOfBirth: "";
+        // email: "";
+        // gender: "";
+        // id: 3;
+        // maritalStatus: "";
+        // name: "Patient";
+        // phoneNumber: "";
+        var data = resp.data;
+        var form = this.form;
+        form.name = data.name;
+        form.addr = data.address;
+        form.gender = data.gender;
+        form.email = data.email;
+        form.dob = Date.parse(data.dateOfBirth);
+        form.marital = data.maritalStatus;
+        form.phone = data.phoneNumber;
+      })
+      .catch((error) => {
+        //error handling
+        console.log(error);
+        var loginCode = error.response.status;
+        if (loginCode == 404) {
+          this.$message.error("Record does not exist!");
+        }
+      });
   },
   computed: {
     age: function () {
@@ -97,7 +126,41 @@ export default {
   },
   methods: {
     submitForm() {
-      console.log(this.form.name);
+      var dob = new Date(this.form.dob);
+      var year = dob.getFullYear();
+      var month = dob.getMonth();
+      var day = dob.getDate();
+      var params = {
+        id: this.id,
+        address: this.form.addr,
+        dateOfBirth: year + "-" + month + "-" + day + "T00:00:00",
+        email: this.form.email,
+        gender: this.form.gender,
+        maritalStatus: this.form.marital,
+        name: this.form.name,
+        phoneNumber: this.form.phone,
+      };
+      axios
+        .put("../api/personal_information/" + this.id + "/", params)
+        .then((resp) => {
+          var data = resp.data;
+          var form = this.form;
+          form.name = data.name;
+          form.addr = data.address;
+          form.gender = data.gender;
+          form.email = data.email;
+          form.dob = Date.parse(data.dateOfBirth);
+          form.marital = data.maritalStatus;
+          form.phone = data.phoneNumber;
+        })
+        .catch((error) => {
+          //error handling
+          console.log(error);
+          var loginCode = error.response.status;
+          if (loginCode == 404) {
+            this.$message.error("Record does not exist!");
+          }
+        });
     },
   },
 };
