@@ -79,6 +79,7 @@ class MedicalRecord(models.Model):
     treatments = models.CharField(max_length=300)
     diagnosis = models.CharField(max_length=300)
     attachmentNb = models.IntegerField(default=0)
+    flag = models.BooleanField(blank=False)
 
     class Meta:
         db_table = 'medical_record'
