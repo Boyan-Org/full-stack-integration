@@ -121,7 +121,6 @@ export default {
           }
         });
 
-      // alert(JSON.stringify(this.form));
     },
 
     open() {
