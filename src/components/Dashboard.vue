@@ -10,12 +10,15 @@
       :default-active="nav_index"
       :v-model="nav_index"
       router=""
+      background-color="#545c64"
+      text-color="#fff"
+      active-text-color="#ffd04b"
     >
       <el-menu-item index="dashboard">
         <i class="el-icon-menu"></i>
         <span slot="title">Dashboard</span>
       </el-menu-item>
-      <el-submenu index="1">
+      <!-- <el-submenu index="1">
         <template slot="title">
           <i class="el-icon-location"></i>
           <span slot="title">导航一</span>
@@ -36,9 +39,17 @@
       <el-menu-item index="3" disabled>
         <i class="el-icon-document"></i>
         <span slot="title">导航三</span>
+      </el-menu-item> -->
+      <el-menu-item index="booking">
+        <i class="el-icon-date"></i>
+        <span slot="title">Appointment</span>
+      </el-menu-item>
+      <el-menu-item index="record">
+        <i class="el-icon-s-order"></i>
+        <span slot="title">Medical Record</span>
       </el-menu-item>
       <el-menu-item index="person">
-        <i class="el-icon-setting"></i>
+        <i class="el-icon-user-solid"></i>
         <span slot="title">Personal Information</span>
       </el-menu-item>
     </el-menu>
@@ -53,8 +64,8 @@
               placement="bottom"
             >
               <el-checkbox-button id="checkButton">
-                <i v-if="isCollapse" class="el-icon-s-unfold" id="before"></i>
-                <i v-if="!isCollapse" class="el-icon-s-fold"></i>
+                <i v-if="isCollapse" class="el-icon-s-unfold before"></i>
+                <i v-if="!isCollapse" class="el-icon-s-fold before"></i>
               </el-checkbox-button>
             </el-tooltip>
           </el-checkbox-group>
@@ -68,7 +79,9 @@
                 <el-dropdown-item @click.native="person">
                   Personal Information
                 </el-dropdown-item>
-                <el-dropdown-item divided @click.native="logout">Log Out</el-dropdown-item>
+                <el-dropdown-item divided @click.native="logout"
+                  >Log Out</el-dropdown-item
+                >
               </el-dropdown-menu>
             </el-dropdown>
             <h4 id="greetUser">{{ greeting }}</h4>
@@ -86,7 +99,7 @@
 </template>
 
 <script>
-import router from '../router';
+import router from "../router";
 export default {
   data() {
     return {
@@ -140,10 +153,10 @@ export default {
     handleClose(key, keyPath) {
       console.log(key, keyPath);
     },
-    logout(){
+    logout() {
       sessionStorage.clear();
       router.push("/");
-    }
+    },
   },
   watch: {
     isCollapse: function () {
@@ -167,6 +180,17 @@ export default {
 </script>
 
 <style>
+.el-header {
+  color: white;
+  background: linear-gradient(
+    225deg,
+    rgb(4, 0, 87) 0%,
+    rgba(48, 7, 105, 0.603) 30%,
+    rgba(9, 9, 121, 0.479) 44%,
+    rgb(0, 195, 234) 100%
+  );
+}
+
 #header {
   height: 100%;
   display: flex;
@@ -179,16 +203,6 @@ export default {
   flex-direction: column;
 }
 
-.navToggle {
-  color: #409eff;
-  font-family: Open Sans;
-  font-size: 30px;
-  text-decoration: none;
-  display: inline-block;
-  cursor: pointer;
-  text-align: center;
-}
-
 .el-checkbox-button:last-child .el-checkbox-button__inner {
   font-size: 30px;
   padding: 3px 5px;
@@ -196,8 +210,12 @@ export default {
   border: 0 !important;
 }
 
-#before {
-  color: #409eff !important;
+.before {
+  color: #ffffff !important;
+}
+
+.before:hover {
+  color: #1b26c4 !important;
 }
 
 #navBar {
