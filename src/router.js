@@ -13,21 +13,17 @@ import DashInfo from "./components/DashInfo";
 
 import Appointment from "./components/Appointment.vue";
 
+import RecordView from "./components/RecordView.vue";
+import RecordEdit from "./components/RecordEdit.vue";
+import RecordUpload from "./components/RecordUpload.vue";
+import Page404 from "./components/Page404.vue";
+import RecordFilter from "./components/RecordFilter.vue";
+
 Vue.use(Router)
 
 export default new Router({
   mode: 'history',
   routes: [
-    // {
-    //   path: '/',
-    //   name: 'home',
-    //   component: VueDemo
-    // },
-    // {
-    //   path: '/messages',
-    //   name: 'messages',
-    //   component: Messages
-    // },
     {
       path: '/login',
       component: AccountInput,
@@ -61,7 +57,7 @@ export default new Router({
       ]
     },
     {
-      path: '/appointment', component: Dashboard, children: [
+      path: '/booking', component: Dashboard, children: [
         { path: '', component: Appointment }
       ]
     },
@@ -69,5 +65,34 @@ export default new Router({
       path: '/',
       redirect: '/login'
     },
+    {
+      path: '/record', component: Dashboard, children: [ //view record list
+        { path: '', component: RecordFilter }
+      ]
+    }, 
+    {
+      path: '/record/:id', component: Dashboard, children: [ //view record list
+        { path: '', component: RecordView }
+      ]
+    }, 
+    {
+      path: '/record/edit/:id', component: Dashboard, children: [
+        { path: '', component: RecordEdit }
+      ]
+    },
+    {
+      path: '/record/upload/:id', component: Dashboard, children: [
+        { path: '', component: RecordUpload }
+      ]
+    },
+    {
+      name: '404',
+      path: '/404',
+      component: Page404
+    },
+    {
+      path: '*',
+      redirect: '/404'
+    }
   ]
 })
