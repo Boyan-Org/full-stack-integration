@@ -128,7 +128,7 @@ export default {
     submitForm() {
       var dob = new Date(this.form.dob);
       var year = dob.getFullYear();
-      var month = dob.getMonth();
+      var month = dob.getMonth() + 1;
       var day = dob.getDate();
       var params = {
         id: this.id,
@@ -140,6 +140,7 @@ export default {
         name: this.form.name,
         phoneNumber: this.form.phone,
       };
+      console.log(year + "-" + month + "-" + day + "T00:00:00");
       axios
         .put("../api/personal_information/" + this.id + "/", params)
         .then((resp) => {
@@ -152,6 +153,10 @@ export default {
           form.dob = Date.parse(data.dateOfBirth);
           form.marital = data.maritalStatus;
           form.phone = data.phoneNumber;
+          this.$message({
+            type: "success",
+            message: "Success!",
+          });
         })
         .catch((error) => {
           //error handling
