@@ -73,7 +73,7 @@
       style="width: 100%"
       :default-sort="{ prop: 'date', order: 'descending' }"
       @row-click="enterRecord"
-      height="530px"
+      height="510px"
     >
       <el-table-column prop="doctor_name" label="Doctor" width="180" sortable>
       </el-table-column>

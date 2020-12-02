@@ -4,21 +4,30 @@
     </el-page-header>
 
     <el-card class="header">
-      <table style="width: 100%">
-        <tr>
-          <th class="headerEntry">Name: {{ patientName }}</th>
-          <th class="headerEntry">Age: {{ patientAge }}</th>
-          <th class="headerEntry">Gender: {{ patientGender }}</th>
-        </tr>
-        <tr>
-          <th class="headerEntry">Doctor: {{ doctorName }}</th>
-          <th class="headerEntry">Department: {{ dept }}</th>
-          <th class="headerEntry">
-            Time:
-            {{ Intl.DateTimeFormat("zh-CN", timeOption).format(recordTime) }}
-          </th>
-        </tr>
-      </table>
+      <el-row>
+        <el-col :span="23">
+          <table style="width: 100%">
+            <tr>
+              <th class="headerEntry">Name: {{ patientName }}</th>
+              <th class="headerEntry">Age: {{ patientAge }}</th>
+              <th class="headerEntry">Gender: {{ patientGender }}</th>
+            </tr>
+            <tr>
+              <th class="headerEntry">Doctor: {{ doctorName }}</th>
+              <th class="headerEntry">Department: {{ dept }}</th>
+              <th class="headerEntry">
+                Time:
+                {{
+                  Intl.DateTimeFormat("zh-CN", timeOption).format(recordTime)
+                }}
+              </th>
+            </tr>
+          </table>
+        </el-col>
+        <el-col :span="1">
+            <el-button type="primary" icon="el-icon-edit" circle v-if="!finalized" @click="edit"></el-button>
+        </el-col>
+      </el-row>
     </el-card>
 
     <el-card class="box-card" id="recordBody">
@@ -107,7 +116,7 @@ export default {
       page: 1,
       totalPage: 1,
 
-      modify: false,
+      finalized: false,
       current: 1,
       pdfSrc: "../../static/dummy.pdf",
       timeOption: {
@@ -167,6 +176,8 @@ export default {
         this.patientGender = rData.patient_gender;
         this.recordTime = Date.parse(rData.dateTime);
         this.totalPage = rData.attachmentNb + 1;
+        // this.finalized = rData.flag;
+        this.finalized = (rData.flag || sessionStorage.getItem("role") != "doctor");
       })
       .catch((error) => {
         //error handling
@@ -178,6 +189,9 @@ export default {
       });
   },
   methods: {
+    edit(){
+      router.push("/record/edit/"+this.recordID);
+    },
     goBack() {
       router.back();
     },
