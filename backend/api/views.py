@@ -414,14 +414,15 @@ class AppViewSet(viewsets.ModelViewSet):
             }
         Response JSON:
             {
-                "record_num": 2,
                 "record_data": [
                     {
                         "appointmentID": 1,
                         "dateTime": "2020-11-29T14:00:00",
                         "department": "dept1",
                         "doctor_id": 2,
+                        "doctor_name": "Boyan Xu",
                         "patient_id": 1,
+                        "patient_name": "Frank Zhou",
                         "submitTime": "2020-11-28T22:00:00"
                     },
                     {
@@ -429,10 +430,13 @@ class AppViewSet(viewsets.ModelViewSet):
                         "dateTime": "2020-11-30T14:00:00",
                         "department": "dept1",
                         "doctor_id": 2,
+                        "doctor_name": "Boyan Xu",
                         "patient_id": 1,
+                        "patient_name": "Frank Zhou",
                         "submitTime": "2020-11-28T22:00:00"
                     }
                 ],
+                "record_num": 2
             }
         """
         data = JSONParser().parse(request)
@@ -444,14 +448,18 @@ class AppViewSet(viewsets.ModelViewSet):
         record_data = list(q)
         for record in record_data:
             dept = get_department(record["doctor_id"]).department
-            record.update({"department":dept})
+            patient_name = get_person_info(record["patient_id"]).name
+            doctor_name = get_person_info(record["doctor_id"]).name
+            record.update({
+                "department":dept,
+                "patient_name":patient_name,
+                "doctor_name":doctor_name,
+            })
+
         return_data = {"record_num":len(record_data), "record_data":record_data}
         return Response(data=return_data, status=HTTP_200_OK)
 
         
-                
-
-            
 
 # Assistant Functions
 def get_person_info(id):
