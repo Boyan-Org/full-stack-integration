@@ -11,13 +11,16 @@ import AccountInput from "./components/AccountInput.vue";
 import InfoBoard from "./components/InfoBoard.vue";
 import DashInfo from "./components/DashInfo";
 
-import Appointment from "./components/Appointment.vue";
+import MakeAppointment from "./components/MakeAppointment.vue";
 
 import RecordView from "./components/RecordView.vue";
 import RecordEdit from "./components/RecordEdit.vue";
 import RecordUpload from "./components/RecordUpload.vue";
 import Page404 from "./components/Page404.vue";
 import RecordFilter from "./components/RecordFilter.vue";
+
+import ListAppointment from "./components/ListAppointment.vue";
+import RecordCreate from "./components/RecordCreate.vue";
 
 Vue.use(Router)
 
@@ -58,7 +61,17 @@ export default new Router({
     },
     {
       path: '/booking', component: Dashboard, children: [
-        { path: '', component: Appointment }
+        { path: '', component: MakeAppointment }
+      ]
+    },
+    {
+      path: '/listAppointment', component: Dashboard, children: [
+        { path: '', component: ListAppointment }
+      ]
+    },
+    {
+      path: '/newRecord/:patient_id/:medicalRecord_id', component: Dashboard, children: [ // create a new record for certain patient
+        { path: '', component: RecordCreate }
       ]
     },
     {

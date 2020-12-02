@@ -40,9 +40,9 @@
         <i class="el-icon-document"></i>
         <span slot="title">导航三</span>
       </el-menu-item> -->
-      <el-menu-item index="booking">
+      <el-menu-item v-if="this.user.role==='patient'" index="booking">
         <i class="el-icon-date"></i>
-        <span slot="title">Appointment</span>
+        <span slot="title">Make an Appointment</span>
       </el-menu-item>
       <el-menu-item index="record">
         <i class="el-icon-s-order"></i>
@@ -52,7 +52,12 @@
         <i class="el-icon-user-solid"></i>
         <span slot="title">Personal Information</span>
       </el-menu-item>
+      <el-menu-item v-if="this.user.role==='doctor'" index="listAppointment" >
+        <i class="el-icon-user-solid"></i>
+        <span slot="title">My Appointments</span>
+      </el-menu-item>
     </el-menu>
+
     <el-container>
       <el-header>
         <div id="header">
