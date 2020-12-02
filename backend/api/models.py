@@ -47,8 +47,8 @@ class MedicalInfo(models.Model):
         primary_key=True,
         db_column='id',
     )
-    height = models.IntegerField()
-    weight = models.IntegerField()
+    height = models.IntegerField(default=0)
+    weight = models.IntegerField(default=0)
     familyHistory = models.CharField(max_length=100)
     surgicalHistory = models.CharField(max_length=100)
     allergies = models.CharField(max_length=100)
@@ -64,9 +64,9 @@ class DepartmentInfo(models.Model):
         primary_key=True,
         db_column='id',
     )
-    department = models.CharField(max_length=100, blank=False)
+    department = models.CharField(max_length=100)
     supervisor = models.CharField(max_length=100)
-    workingHour = models.CharField(max_length=100, blank=False)
+    workingHour = models.CharField(max_length=100)
     class Meta:
         db_table = 'dept_info'
 
