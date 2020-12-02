@@ -1,15 +1,24 @@
 <template>
   <el-container>
     <el-menu
-      default-active="1-4-1"
       class="el-menu-vertical"
       id="navBar"
       @open="handleOpen"
       @close="handleClose"
       :collapse="isCollapse"
       :style="{ height: height }"
+      :default-active="nav_index"
+      :v-model="nav_index"
+      router=""
+      background-color="#545c64"
+      text-color="#fff"
+      active-text-color="#ffd04b"
     >
-      <el-submenu index="1">
+      <el-menu-item index="dashboard">
+        <i class="el-icon-menu"></i>
+        <span slot="title">Dashboard</span>
+      </el-menu-item>
+      <!-- <el-submenu index="1">
         <template slot="title">
           <i class="el-icon-location"></i>
           <span slot="title">导航一</span>
@@ -27,17 +36,21 @@
           <el-menu-item index="1-4-1">选项1</el-menu-item>
         </el-submenu>
       </el-submenu>
-      <el-menu-item index="2">
-        <i class="el-icon-menu"></i>
-        <span slot="title">导航二</span>
-      </el-menu-item>
       <el-menu-item index="3" disabled>
         <i class="el-icon-document"></i>
         <span slot="title">导航三</span>
+      </el-menu-item> -->
+      <el-menu-item index="booking">
+        <i class="el-icon-date"></i>
+        <span slot="title">Appointment</span>
       </el-menu-item>
-      <el-menu-item index="4">
-        <i class="el-icon-setting"></i>
-        <span slot="title">导航四</span>
+      <el-menu-item index="record">
+        <i class="el-icon-s-order"></i>
+        <span slot="title">Medical Record</span>
+      </el-menu-item>
+      <el-menu-item index="person">
+        <i class="el-icon-user-solid"></i>
+        <span slot="title">Personal Information</span>
       </el-menu-item>
     </el-menu>
     <el-container>
@@ -51,8 +64,8 @@
               placement="bottom"
             >
               <el-checkbox-button id="checkButton">
-                <i v-if="isCollapse" class="el-icon-s-unfold" id="before"></i>
-                <i v-if="!isCollapse" class="el-icon-s-fold"></i>
+                <i v-if="isCollapse" class="el-icon-s-unfold before"></i>
+                <i v-if="!isCollapse" class="el-icon-s-fold before"></i>
               </el-checkbox-button>
             </el-tooltip>
           </el-checkbox-group>
@@ -63,8 +76,12 @@
                 <el-avatar icon="el-icon-user-solid"></el-avatar>
               </span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item>Personal Information</el-dropdown-item>
-                <el-dropdown-item divided>Log Out</el-dropdown-item>
+                <el-dropdown-item @click.native="person">
+                  Personal Information
+                </el-dropdown-item>
+                <el-dropdown-item divided @click.native="logout"
+                  >Log Out</el-dropdown-item
+                >
               </el-dropdown-menu>
             </el-dropdown>
             <h4 id="greetUser">{{ greeting }}</h4>
@@ -75,117 +92,14 @@
         id="dashboard-content"
         :style="{ height: contentHeight, width: contentWidth }"
       >
-      <div id="lorem">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam
-        pulvinar ipsum vitae magna venenatis venenatis. Nunc vehicula, diam sit
-        amet suscipit luctus, massa est vestibulum dolor, id vulputate elit
-        purus ut neque. Donec fermentum tortor lorem, non varius turpis
-        scelerisque at. Suspendisse consequat turpis at odio maximus vehicula.
-        Ut malesuada at ante a mollis. Suspendisse sed dapibus justo. Maecenas
-        tortor erat, dapibus sed mi in, posuere iaculis augue. Donec scelerisque
-        arcu nec dictum fermentum. Proin vitae nibh orci. Nunc viverra tincidunt
-        urna, id consequat augue blandit quis. Sed vitae interdum odio, pulvinar
-        auctor magna. Quisque augue erat, finibus non interdum sit amet, egestas
-        ut nulla. Aenean vitae purus nisi. Aenean suscipit finibus nulla eu
-        blandit. Morbi a ipsum in tortor luctus porta eu in sem. Nulla hendrerit
-        nibh eget eros pellentesque facilisis sed eu justo. Cras mollis ac neque
-        et imperdiet. Vivamus nec lectus lectus. Sed a imperdiet ipsum. Donec
-        aliquet vitae nisl vel commodo. Phasellus congue iaculis massa, at
-        commodo est placerat in. Etiam ac interdum felis. Sed mollis odio justo,
-        et molestie odio finibus eget. Fusce sodales, augue ut faucibus
-        vestibulum, augue eros imperdiet sem, at volutpat sapien nunc id turpis.
-        Quisque molestie suscipit dui, ut euismod felis mollis in. Nulla nec
-        consequat urna, ut commodo turpis. Quisque eu auctor enim. Morbi orci
-        enim, euismod in vulputate nec, dapibus et magna. Orci varius natoque
-        penatibus et magnis dis parturient montes, nascetur ridiculus mus.
-        Suspendisse quis nisl nec arcu mollis euismod eu at arcu. Duis nec est
-        eget lectus laoreet pretium. Vivamus vel nulla et eros congue mattis in
-        eget eros. Praesent facilisis convallis velit, elementum euismod leo
-        maximus id. Quisque sodales cursus egestas. Donec maximus est a augue
-        imperdiet mollis. Curabitur placerat purus a sagittis tincidunt. Cras ac
-        magna mattis, varius enim a, vulputate nisl. Quisque imperdiet ante
-        porttitor magna interdum eleifend. Suspendisse ac convallis mi.
-        Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere
-        cubilia curae; Donec hendrerit odio quis laoreet sollicitudin.
-        Suspendisse rhoncus lacinia aliquam. Donec ligula orci, efficitur in
-        eros lacinia, feugiat facilisis diam. Proin blandit vel massa at semper.
-        Phasellus consequat pulvinar velit auctor commodo. Fusce ac mauris
-        dictum nisl interdum feugiat. Duis efficitur, enim at euismod ultricies,
-        dolor urna bibendum velit, quis mattis neque tortor quis tortor. Aenean
-        eget dui laoreet justo fringilla dapibus. Interdum et malesuada fames ac
-        ante ipsum primis in faucibus. Nulla maximus nibh id scelerisque
-        placerat. Vestibulum ante ipsum primis in faucibus orci luctus et
-        ultrices posuere cubilia curae; Vestibulum congue lacinia massa, in
-        scelerisque neque convallis laoreet. Phasellus tristique malesuada
-        neque, a pharetra ex posuere ut. Ut interdum tortor sit amet ante
-        suscipit mollis. Cras porta vestibulum pretium. Sed augue nisi, viverra
-        sed fermentum ac, ultricies at erat. Nulla sit amet iaculis nisl.
-        Maecenas imperdiet nisi in commodo auctor. Nam luctus lorem sed commodo
-        feugiat. Pellentesque ullamcorper ornare augue ut finibus. Mauris mollis
-        iaculis egestas. Proin vel elit ante. Lorem ipsum dolor sit amet,
-        consectetur adipiscing elit. Aliquam pulvinar ipsum vitae magna
-        venenatis venenatis. Nunc vehicula, diam sit amet suscipit luctus, massa
-        est vestibulum dolor, id vulputate elit purus ut neque. Donec fermentum
-        tortor lorem, non varius turpis scelerisque at. Suspendisse consequat
-        turpis at odio maximus vehicula. Ut malesuada at ante a mollis.
-        Suspendisse sed dapibus justo. Maecenas tortor erat, dapibus sed mi in,
-        posuere iaculis augue. Donec scelerisque arcu nec dictum fermentum.
-        Proin vitae nibh orci. Nunc viverra tincidunt urna, id consequat augue
-        blandit quis. Sed vitae interdum odio, pulvinar auctor magna. Quisque
-        augue erat, finibus non interdum sit amet, egestas ut nulla. Aenean
-        vitae purus nisi. Aenean suscipit finibus nulla eu blandit. Morbi a
-        ipsum in tortor luctus porta eu in sem. Nulla hendrerit nibh eget eros
-        pellentesque facilisis sed eu justo. Cras mollis ac neque et imperdiet.
-        Vivamus nec lectus lectus. Sed a imperdiet ipsum. Donec aliquet vitae
-        nisl vel commodo. Phasellus congue iaculis massa, at commodo est
-        placerat in. Etiam ac interdum felis. Sed mollis odio justo, et molestie
-        odio finibus eget. Fusce sodales, augue ut faucibus vestibulum, augue
-        eros imperdiet sem, at volutpat sapien nunc id turpis. Quisque molestie
-        suscipit dui, ut euismod felis mollis in. Nulla nec consequat urna, ut
-        commodo turpis. Quisque eu auctor enim. Morbi orci enim, euismod in
-        vulputate nec, dapibus et magna. Orci varius natoque penatibus et magnis
-        dis parturient montes, nascetur ridiculus mus. Suspendisse quis nisl nec
-        arcu mollis euismod eu at arcu. Duis nec est eget lectus laoreet
-        pretium. Vivamus vel nulla et eros congue mattis in eget eros. Praesent
-        facilisis convallis velit, elementum euismod leo maximus id. Quisque
-        sodales cursus egestas. Donec maximus est a augue imperdiet mollis.
-        Curabitur placerat purus a sagittis tincidunt. Cras ac magna mattis,
-        varius enim a, vulputate nisl. Quisque imperdiet ante porttitor magna
-        interdum eleifend. Suspendisse ac convallis mi. Vestibulum ante ipsum
-        primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec
-        hendrerit odio quis laoreet sollicitudin. Suspendisse rhoncus lacinia
-        aliquam. Donec ligula orci, efficitur in eros lacinia, feugiat facilisis
-        diam. Proin blandit vel massa at semper. Phasellus consequat pulvinar
-        velit auctor commodo. Fusce ac mauris dictum nisl interdum feugiat. Duis
-        efficitur, enim at euismod ultricies, dolor urna bibendum velit, quis
-        mattis neque tortor quis tortor. Aenean eget dui laoreet justo fringilla
-        dapibus. Interdum et malesuada fames ac ante ipsum primis in faucibus.
-        Nulla maximus nibh id scelerisque placerat. Vestibulum ante ipsum primis
-        in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum
-        congue lacinia massa, in scelerisque neque convallis laoreet. Phasellus
-        tristique malesuada neque, a pharetra ex posuere ut. Ut interdum tortor
-        sit amet ante suscipit mollis. Cras porta vestibulum pretium. Sed augue
-        nisi, viverra sed fermentum ac, ultricies at erat. Nulla sit amet
-        iaculis nisl. Maecenas imperdiet nisi in commodo auctor. Nam luctus
-        lorem sed commodo feugiat. Pellentesque ullamcorper ornare augue ut
-        finibus. Mauris mollis iaculis egestas. Proin vel elit ante. malesuada
-        fames ac ante ipsum primis in faucibus. Nulla maximus nibh id
-        scelerisque placerat. Vestibulum ante ipsum primis in faucibus orci
-        luctus et ultrices posuere cubilia curae; Vestibulum congue lacinia
-        massa, in scelerisque neque convallis laoreet. Phasellus tristique
-        malesuada neque, a pharetra ex posuere ut. Ut interdum tortor sit amet
-        ante suscipit mollis. Cras porta vestibulum pretium. Sed augue nisi,
-        viverra sed fermentum ac, ultricies at erat. Nulla sit amet iaculis
-        nisl. Maecenas imperdiet nisi in commodo auctor. Nam luctus lorem sed
-        commodo feugiat. Pellentesque ullamcorper ornare augue ut finibus.
-        Mauris mollis iaculis egestas. Proin vel elit ante.
-      </div>
+        <router-view></router-view>
       </el-main>
     </el-container>
   </el-container>
 </template>
 
 <script>
+import router from "../router";
 export default {
   data() {
     return {
@@ -193,9 +107,19 @@ export default {
       windowWidth: document.body.clientWidth,
       isCollapse: false,
       sideWidth: "201px",
-      user: "TestUser",
       contentWidth: document.body.clientWidth - 202 + "px",
+      nav_index: this.$route.path.substr(1),
+      user: {},
     };
+  },
+  created: function () {
+    if (sessionStorage.getItem("id") != null) {
+      this.user.id = sessionStorage.getItem("id");
+      this.user.name = sessionStorage.getItem("name");
+      this.user.role = sessionStorage.getItem("role");
+    } else {
+      router.push("/");
+    }
   },
   mounted() {
     window.onresize = () => {
@@ -213,15 +137,25 @@ export default {
       return this.windowHeight - 60 + "px";
     },
     greeting: function () {
-      return "Hello, " + this.user;
+      return "Hello, " + this.user.name;
     },
   },
   methods: {
+    person() {
+      this.$router.push("/person").catch((err) => {
+        err;
+      });
+      location.reload();
+    },
     handleOpen(key, keyPath) {
       console.log(key, keyPath);
     },
     handleClose(key, keyPath) {
       console.log(key, keyPath);
+    },
+    logout() {
+      sessionStorage.clear();
+      router.push("/");
     },
   },
   watch: {
@@ -246,13 +180,16 @@ export default {
 </script>
 
 <style>
-/* .el-menu-vertical {
-  height: 100%;
-} */
-
-/* .el-menu-vertical:not(.el-menu--collapse) {
-  width: 200px;
-} */
+.el-header {
+  color: white;
+  background: linear-gradient(
+    225deg,
+    rgb(4, 0, 87) 0%,
+    rgba(48, 7, 105, 0.603) 30%,
+    rgba(9, 9, 121, 0.479) 44%,
+    rgb(0, 195, 234) 100%
+  );
+}
 
 #header {
   height: 100%;
@@ -262,20 +199,8 @@ export default {
 }
 
 #dashboard-content {
-  background-image: url("../assets/login-hero-crop.jpg");
-  background-size: cover;
   overflow-y: auto !important;
   flex-direction: column;
-}
-
-.navToggle {
-  color: #409EFF;
-  font-family: Open Sans;
-  font-size: 30px;
-  text-decoration: none;
-  display: inline-block;
-  cursor: pointer;
-  text-align: center;
 }
 
 .el-checkbox-button:last-child .el-checkbox-button__inner {
@@ -285,8 +210,12 @@ export default {
   border: 0 !important;
 }
 
-#before {
-  color: #409EFF !important;
+.before {
+  color: #ffffff !important;
+}
+
+.before:hover {
+  color: #1b26c4 !important;
 }
 
 #navBar {
@@ -311,9 +240,5 @@ export default {
 
 #greetUser {
   margin-right: 10px;
-}
-
-#lorem{
-    display: none;
 }
 </style>
