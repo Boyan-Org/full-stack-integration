@@ -89,19 +89,31 @@ def register(request):
         409: `Username` already taken by someone else
     """
     data = JSONParser().parse(request)
-    name = data['name']
-    role = data['role']
+    try:
+        name = data['name']
+        role = data['role']
+    except:
+        return Response(data={"error":"missing register information"}, status=status.HTTP_404_NOT_FOUND)
     serializer = AccountSerializer(data=data)
     if serializer.is_valid():
         account = serializer.save()
         personal_info = PersonalInfo(name=name, id=account)
-        personal_info.save()
         if role == 'patient':
-            medical_info = MedicalInfo(id=account)
-            medical_info.save()
+            try:
+                medical_info = MedicalInfo(id=account)
+                medical_info.save()
+            except:
+                account.delete()
+                return Response(data={"error":"fail to auto-create medical_info"}, status=status.HTTP_417_EXPECTATION_FAILED)
         else:
-            dept_info = DepartmentInfo(id=account)
-            dept_info.save()
+            try:
+                dept_info = DepartmentInfo(id=account)
+                dept_info.save()
+            except:
+                account.delete()
+                return Response(data={"error":"fail to auto-create dept_info"}, status=status.HTTP_417_EXPECTATION_FAILED)
+  
+        personal_info.save()
         return Response(status=status.HTTP_201_CREATED)
     else:
         return Response(serializer.data, status=status.HTTP_409_CONFLICT)
@@ -355,7 +367,7 @@ class AppViewSet(viewsets.ModelViewSet):
             workingHour = json.loads(DepartmentInfo.objects.get(id=doctor_id).workingHour)
         except DepartmentInfo.DoesNotExist:
             return Response(data={"error":"doctor working hour missing"}, status=HTTP_404_NOT_FOUND)
-            
+
         dateTime = datetime.datetime.strptime(dateTime, '%Y-%m-%dT%H:%M:%S')
         weekday = dateTime.weekday()
         time = 0 if dateTime.hour<12 else 1
