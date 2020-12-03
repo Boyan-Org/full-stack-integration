@@ -243,6 +243,15 @@ class MRViewSet(viewsets.ModelViewSet):
     queryset = MedicalRecord.objects.all()
     serializer_class = MRSerializer
 
+    def create(self, request):
+        serializer = MRSerializer(data=request.data)
+        if serializer.is_valid():
+            record_id = serializer.save().recordID
+            return Response(data={"record_id":record_id}, status=status.HTTP_200_OK)
+        else:
+            return Response(data=request.data, status=status.HTTP_406_NOT_ACCEPTABLE)
+        
+
     def retrieve(self, request, pk=None):
         """
         Modified ModelViewSet.retrieve()
@@ -451,6 +460,11 @@ class AppViewSet(viewsets.ModelViewSet):
         return_data = {"record_num":len(record_data), "record_data":record_data}
         return Response(data=return_data, status=HTTP_200_OK)
 
+    @action(detail=False, methods=['POST'])
+    def get_available_slots(self, request):
+        data = JSONParser().parse(request)
+        if "patient_id" not in data:
+            return Response(data={"error":"patient identity missing"}, status=HTTP_404_NOT_FOUND)
 
 # Assistant Functions
 def get_person_info(id):
