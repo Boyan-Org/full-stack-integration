@@ -27,12 +27,12 @@ class PersonalInfo(models.Model):
         db_column='id',
     )
     name = models.CharField(max_length=100, blank=False)
-    gender = models.CharField(max_length=100)
-    dateOfBirth = models.CharField(max_length=100)
-    email = models.CharField(max_length=100)
-    phoneNumber = models.CharField(max_length=11)
-    address = models.CharField(max_length=100)
-    maritalStatus = models.CharField(max_length=100)
+    gender = models.CharField(max_length=100, blank=True)
+    dateOfBirth = models.CharField(max_length=100,blank=True)
+    email = models.CharField(max_length=100,blank=True)
+    phoneNumber = models.CharField(max_length=11,blank=True)
+    address = models.CharField(max_length=100,blank=True)
+    maritalStatus = models.CharField(max_length=100,blank=True)
 
 
 
@@ -47,13 +47,13 @@ class MedicalInfo(models.Model):
         primary_key=True,
         db_column='id',
     )
-    height = models.IntegerField(default=0)
-    weight = models.IntegerField(default=0)
-    familyHistory = models.CharField(max_length=100)
-    surgicalHistory = models.CharField(max_length=100)
-    allergies = models.CharField(max_length=100)
-    bloodType = models.CharField(max_length=1)
-    habits = models.CharField(max_length=100)
+    height = models.IntegerField(default=0, blank=True)
+    weight = models.IntegerField(default=0, blank=True)
+    familyHistory = models.CharField(max_length=100, blank=True)
+    surgicalHistory = models.CharField(max_length=100, blank=True)
+    allergies = models.CharField(max_length=100, blank=True)
+    bloodType = models.CharField(max_length=1, blank=True)
+    habits = models.CharField(max_length=100, blank=True)
     class Meta:
         db_table = 'medical_info'
 
@@ -64,9 +64,9 @@ class DepartmentInfo(models.Model):
         primary_key=True,
         db_column='id',
     )
-    department = models.CharField(max_length=100)
-    supervisor = models.CharField(max_length=100)
-    workingHour = models.CharField(max_length=100)
+    department = models.CharField(max_length=100, blank=True)
+    supervisor = models.CharField(max_length=100, blank=True)
+    workingHour = models.CharField(max_length=100, blank=True)
     class Meta:
         db_table = 'dept_info'
 
@@ -75,10 +75,10 @@ class MedicalRecord(models.Model):
     patient = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patient_id')
     doctor = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctor_id')
     dateTime = models.DateTimeField(blank=False)
-    symptoms = models.CharField(max_length=300)
-    treatments = models.CharField(max_length=300)
-    diagnosis = models.CharField(max_length=300)
-    attachmentNb = models.IntegerField(default=0)
+    symptoms = models.CharField(max_length=300, blank=True)
+    treatments = models.CharField(max_length=300, blank=True)
+    diagnosis = models.CharField(max_length=300, blank=True)
+    attachmentNb = models.IntegerField(default=0, blank=True)
     flag = models.BooleanField(blank=False)
 
     class Meta:
