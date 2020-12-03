@@ -362,28 +362,29 @@ class AppViewSet(viewsets.ModelViewSet):
             return Response(data=request.data, status=status.HTTP_406_NOT_ACCEPTABLE)
         doctor_id = request.data['doctor']
         patient_id = request.data['patient']
-        dateTime = request.data['dateTime']
-        try:
-            workingHour = json.loads(DepartmentInfo.objects.get(id=doctor_id).workingHour)
-        except DepartmentInfo.DoesNotExist:
-            return Response(data={"error":"doctor working hour missing"}, status=HTTP_404_NOT_FOUND)
+        date = request.data['date']
+        time = request.data['time']
 
-        dateTime = datetime.datetime.strptime(dateTime, '%Y-%m-%dT%H:%M:%S')
-        weekday = dateTime.weekday()
-        time = 0 if dateTime.hour<12 else 1
+        workingHour = get_department(doctor_id).workingHour
+        if len(workingHour) == 0:
+            return Response(data={"error":"doctor working hour missing"}, status=HTTP_404_NOT_FOUND)
+        workingHour = json.loads(workingHour)
+        date = datetime.datetime.strptime(date, '%Y-%m-%d')
+        weekday = date.weekday()
+        time_num = 0 if time=='morning' else 1
 
         # check availability
-        if not workingHour[weekday][time]:
+        if not workingHour[weekday][time_num]:
             return Response(
             data={"error:":"doctor is not available"},
             status=status.HTTP_409_CONFLICT
             )
 
         # check whether too many patients in a slot (maximum 10)
-        appointments = Appointment.objects.filter(doctor_id=doctor_id, dateTime=dateTime)
+        appointments = Appointment.objects.filter(doctor_id=doctor_id, date=date, time=time)
         if len(list(appointments))>=10:
             return Response(
-                    data={"error":"more than one appointment in a slot"},
+                    data={"error":"more than ten appointment in a slot"},
                     status=status.HTTP_409_CONFLICT,
                 )
 
@@ -396,8 +397,8 @@ class AppViewSet(viewsets.ModelViewSet):
                 )
         # everything ok then create
         if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            app = serializer.save()
+            return Response(data = {"appointment_id":app.appointmentID}, status=status.HTTP_201_CREATED)
         return Response(data=request.data, status=status.HTTP_406_NOT_ACCEPTABLE)
 
     @action(detail=False, methods=['POST'])
@@ -413,31 +414,22 @@ class AppViewSet(viewsets.ModelViewSet):
                 ...
             }
         Response JSON:
-            {
-                "record_data": [
-                    {
-                        "appointmentID": 1,
-                        "dateTime": "2020-11-29T14:00:00",
-                        "department": "dept1",
-                        "doctor_id": 2,
-                        "doctor_name": "Boyan Xu",
-                        "patient_id": 1,
-                        "patient_name": "Frank Zhou",
-                        "submitTime": "2020-11-28T22:00:00"
-                    },
-                    {
-                        "appointmentID": 2,
-                        "dateTime": "2020-11-30T14:00:00",
-                        "department": "dept1",
-                        "doctor_id": 2,
-                        "doctor_name": "Boyan Xu",
-                        "patient_id": 1,
-                        "patient_name": "Frank Zhou",
-                        "submitTime": "2020-11-28T22:00:00"
-                    }
-                ],
-                "record_num": 2
-            }
+                {
+                    "record_data": [
+                        {
+                            "appointmentID": 2,
+                            "date": "2020-12-02",
+                            "department": "dept1",
+                            "doctor_id": 2,
+                            "doctor_name": "Boyan Xu",
+                            "patient_id": 1,
+                            "patient_name": "Frank Zhou",
+                            "submitTime": "2020-11-28T22:00:00",
+                            "time": "morning"
+                        }
+                    ],
+                    "record_num": 1
+                }
         """
         data = JSONParser().parse(request)
         # get rid of NULL values
@@ -459,7 +451,6 @@ class AppViewSet(viewsets.ModelViewSet):
         return_data = {"record_num":len(record_data), "record_data":record_data}
         return Response(data=return_data, status=HTTP_200_OK)
 
-        
 
 # Assistant Functions
 def get_person_info(id):
