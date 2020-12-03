@@ -462,9 +462,115 @@ class AppViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['POST'])
     def get_available_slots(self, request):
+        """
+        PATH: http://127.0.0.1:8000/api/appointment/get_available_slots/
+        Note: 
+            The slot is available if and only if:
+                1). The doctor works at that slot
+                2). There are less than 10 people book the slot with the doctor
+                3). The patient has not booked the slot with the doctor
+        Request Json:
+            {
+                "patient_id": 1,
+            }
+        Response Json:
+            {
+                "dates": [
+                    "2020-12-14",
+                    "2020-12-11",
+                    "2020-12-07",
+                    "2020-12-17",
+                    "2020-12-04",
+                    "2020-12-13",
+                    "2020-12-10",
+                    "2020-12-09",
+                    "2020-12-06",
+                    "2020-12-16"
+                ],
+                "dept_names": [
+                    "dept2",
+                    "dept1"
+                ],
+                "doctor_names": [
+                    "Hellen Wang",
+                    "Boyan Xu"
+                ],
+                "slots": [
+                    {
+                        "date": "2020-12-04",
+                        "department": "dept1",
+                        "doctor_id": 2,
+                        "doctor_name": "Boyan Xu",
+                        "time": "morning"
+                    },
+                    ...,
+                    ...,
+                    {
+                        "date": "2020-12-17",
+                        "department": "dept1",
+                        "doctor_id": 2,
+                        "doctor_name": "Boyan Xu",
+                        "time": "afternoon"
+                    },
+                    {
+                        "date": "2020-12-04",
+                        "department": "dept2",
+                        "doctor_id": 3,
+                        "doctor_name": "Hellen Wang",
+                        "time": "morning"
+                    },
+                    ...,
+                    ...,
+                    {
+                        "date": "2020-12-17",
+                        "department": "dept2",
+                        "doctor_id": 3,
+                        "doctor_name": "Hellen Wang",
+                        "time": "afternoon"
+                    }
+                ],
+                "times": [
+                    "morning",
+                    "afternoon"
+                ]
+            }
+        """
         data = JSONParser().parse(request)
         if "patient_id" not in data:
             return Response(data={"error":"patient identity missing"}, status=HTTP_404_NOT_FOUND)
+        # list all the slots filtered by workingHour
+        dept_infos = DepartmentInfo.objects.all()
+        slots = []
+        for dept_info in dept_infos:
+            slots += two_week_working_hour(dept_info)
+        print(slots)
+        
+        for slot in slots:
+            doctor_id = slot["doctor_id"]
+            date = slot["date"]
+            time = slot["time"]
+            appointments = Appointment.objects.filter(doctor_id=doctor_id, date=date, time=time)
+            # filter the slots by maximum number of appointments
+            if len(list(appointments))>=10:
+                slots.remove(slot)
+                continue
+            # filter the slots by whether the patient has booked an appointment with the doctor
+            appointments.filter(patient_id=data["patient_id"])
+            if len(list(appointments))!=0:
+                slots.remove(slot)
+        # extract the unique information
+        dept_names = list(set([slot["department"] for slot in slots]))
+        doctor_names = list(set([slot["doctor_name"] for slot in slots]))
+        dates = list(set([slot["date"] for slot in slots]))
+        times = list(set([slot["time"] for slot in slots]))
+        return_data = {
+            "dept_names": dept_names,
+            "doctor_names": doctor_names,
+            "dates": dates,
+            "times": times,
+            "slots": slots,
+        }
+        return Response(data=return_data, status=status.HTTP_200_OK)
 
 # Assistant Functions
 def get_person_info(id):
@@ -488,4 +594,33 @@ def get_department(id):
         return Response(status=HTTP_404_NOT_FOUND)
     else:
         return info
+
+def two_week_working_hour(dept_info):
+    """
+    convert workingHour into two week's everyday slot 
+    """
+    today = datetime.datetime.today()
+    weekday = today.weekday()
+    workingHour = json.loads(dept_info.workingHour)
+    # print(type(workingHour), workingHour)
+    schedule = []
+    for i in range(14):
+        if workingHour[(weekday+i+1)%7][0]:
+            schedule.append({
+                "date": (today+datetime.timedelta(days=i+1)).date(),
+                "time": "morning",
+                "doctor_id": dept_info.id.id,
+                "doctor_name": get_person_info(dept_info.id.id).name,
+                "department": dept_info.department,
+            })
+        if workingHour[(weekday+i+1)%7][1]:
+            schedule.append({
+                "date": (today+datetime.timedelta(days=i+1)).date(),
+                "time": "afternoon",
+                "doctor_id": dept_info.id.id,
+                "doctor_name": get_person_info(dept_info.id.id).name,
+                "department": dept_info.department,
+            })
+    return schedule
+    
 
