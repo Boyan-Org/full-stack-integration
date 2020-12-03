@@ -48,9 +48,11 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
+      id: sessionStorage.getItem("id"),
       form: {
         blood: "",
         height: "",
@@ -70,6 +72,41 @@ export default {
       var ageDate = new Date(ageDifMs); // miliseconds from epoch
       return Math.abs(ageDate.getUTCFullYear() - 1970);
     },
+  },
+    mounted() {
+      if (sessionStorage.getItem("role") != "patient"){
+        return;
+      }
+    axios
+      .get("../api/medical_information/" + this.id)
+      .then((resp) => {
+        console.log(resp.data);
+        // address: "";
+        // dateOfBirth: "";
+        // email: "";
+        // gender: "";
+        // id: 3;
+        // maritalStatus: "";
+        // name: "Patient";
+        // phoneNumber: "";
+        // var data = resp.data;
+        // var form = this.form;
+        // form.name = data.name;
+        // form.addr = data.address;
+        // form.gender = data.gender;
+        // form.email = data.email;
+        // form.dob = Date.parse(data.dateOfBirth);
+        // form.marital = data.maritalStatus;
+        // form.phone = data.phoneNumber;
+      })
+      .catch((error) => {
+        //error handling
+        console.log(error);
+        var loginCode = error.response.status;
+        if (loginCode == 404) {
+          this.$message.error("Record does not exist!");
+        }
+      });
   },
   methods: {
     submitForm() {
