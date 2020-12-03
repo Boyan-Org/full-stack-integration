@@ -201,12 +201,6 @@ export default {
         );
       };
     },
-    // handleSelectDoc(item) {
-    //   this.form.doctorId = item.id;
-    // },
-    // handleSelectPat(item) {
-    //   this.form.patientId = item.id;
-    // },
     enterRecord(item) {
       // console.log(item.recordID);
       router.push("record/" + item.recordID);
@@ -219,12 +213,6 @@ export default {
       if (this.form.patientId != "") {
         params.patient_id = this.form.patientId;
       }
-      // if (this.form.dept != "") {
-      //   params.dept = this.form.dept;
-      // }
-      // if (this.form.date != "") {
-      //   params.date = this.form.date;
-      // }
       axios
         .post("api/medical_record/filter_record/", params)
         .then((resp) => {

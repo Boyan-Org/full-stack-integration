@@ -17,12 +17,16 @@
     <el-row>
       <el-col :span="12">
         <el-form-item label="Height">
-          <el-input v-model="form.height" placeholder="cm"></el-input>
+          <el-input v-model="form.height">
+            <template slot="append">cm</template>
+          </el-input>
         </el-form-item>
       </el-col>
       <el-col :span="12">
         <el-form-item label="Weight">
-          <el-input v-model="form.weight" placeholder="kg"></el-input>
+          <el-input v-model="form.weight">
+            <template slot="append">kg</template>
+          </el-input>
         </el-form-item>
       </el-col>
     </el-row>
@@ -73,31 +77,32 @@ export default {
       return Math.abs(ageDate.getUTCFullYear() - 1970);
     },
   },
-    mounted() {
-      if (sessionStorage.getItem("role") != "patient"){
-        return;
-      }
+  mounted() {
+    if (sessionStorage.getItem("role") != "patient") {
+      return;
+    }
     axios
-      .get("../api/medical_information/" + this.id)
+      .get("../api/medical_information/" + this.id + "/")
       .then((resp) => {
-        console.log(resp.data);
-        // address: "";
-        // dateOfBirth: "";
-        // email: "";
-        // gender: "";
-        // id: 3;
-        // maritalStatus: "";
-        // name: "Patient";
-        // phoneNumber: "";
-        // var data = resp.data;
-        // var form = this.form;
-        // form.name = data.name;
-        // form.addr = data.address;
-        // form.gender = data.gender;
-        // form.email = data.email;
-        // form.dob = Date.parse(data.dateOfBirth);
-        // form.marital = data.maritalStatus;
-        // form.phone = data.phoneNumber;
+        // console.log(resp.data);
+        // allergies: "";
+        // bloodType: "";
+        // familyHistory: "";
+        // habits: "";
+        // height: 0;
+        // id: 7;
+        // surgicalHistory: "";
+        // weight: 0;
+
+        var data = resp.data;
+        var form = this.form;
+        form.blood = data.bloodType;
+        form.height = data.height;
+        form.weight = data.weight;
+        form.allergy = data.allergies;
+        form.family = data.familyHistory;
+        form.surgical = data.surgicalHistory;
+        form.habit = data.habits;
       })
       .catch((error) => {
         //error handling
@@ -110,7 +115,33 @@ export default {
   },
   methods: {
     submitForm() {
-      console.log(this.form.name);
+      var form = this.form;
+      var params = {
+        bloodType: form.blood,
+        height: form.height,
+        weight: form.weight,
+        allergies: form.allergy,
+        familyHistory: form.family,
+        surgicalHistory: form.surgical,
+        habits: form.habit,
+      };
+      axios
+        .patch("../api/medical_information/" + this.id + "/", params)
+        .then(() => {
+          // console.log(resp.data);
+          this.$message({
+            type: "success",
+            message: "Success!",
+          });
+        })
+        .catch((error) => {
+          //error handling
+          // console.log(error);
+          var loginCode = error.response.status;
+          if (loginCode == 404) {
+            this.$message.error("Record does not exist!");
+          }
+        });
     },
   },
 };
