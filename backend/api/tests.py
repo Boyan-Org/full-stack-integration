@@ -3,7 +3,7 @@ from django.http import response
 from django.test import TestCase, Client
 
 # class RegisterTestCase(TestCase):
-#     def setup(self):
+#     def setUp(self):
 #         self.client = Client()
 
 #     def test_register(self):
@@ -21,7 +21,7 @@ from django.test import TestCase, Client
 
 
 class LoginTestCase(TestCase):
-    def setup(self):
+    def setUp(self):
         self.client = Client()
         Account.objects.create(
             username = "userfrank",
