@@ -270,7 +270,7 @@ class AppointmentTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(datetime.date(2020,12,16), response.data["dates"])
-        print(response.data["dates"])
+
 
 
 

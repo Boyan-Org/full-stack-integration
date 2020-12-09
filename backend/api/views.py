@@ -385,7 +385,7 @@ class AppViewSet(viewsets.ModelViewSet):
         # check availability
         if not workingHour[weekday][time_num]:
             return Response(
-            data={"error:":"doctor is not available"},
+            data={"error":"doctor is not available"},
             status=status.HTTP_409_CONFLICT
             )
 
