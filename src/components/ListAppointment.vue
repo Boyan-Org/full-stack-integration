@@ -1,7 +1,16 @@
 <template>
   <div>
-    <el-table ref="filterTable" :data="tableData" style="width: 100%">
+    <el-table ref="filterTable" :data="c" style="width: 100%">
       <!-- date column  -->
+
+      <el-table-column
+        prop="appointmentID"
+        label="appointmentID"
+        sortable
+        width="300"
+        column-key="appointmentID"
+      >
+      </el-table-column>
 
       <el-table-column
         prop="date"
@@ -12,21 +21,12 @@
       >
       </el-table-column>
 
-      <!-- <el-table-column
-                prop="queueNum"
-                label="QueueNum"
-                sortable
-                width="240"
-                column-key="queueNum"
-            >
-            </el-table-column> -->
-
       <el-table-column
-        prop="patient"
-        label="Patient"
+        prop="patient_name"
+        label="Patient ID"
         sortable
         width="300"
-        column-key="patient"
+        column-key="patient_name"
       >
       </el-table-column>
 
@@ -40,19 +40,6 @@
         </template>
       </el-table-column>
 
-      <!-- <el-table-column
-            prop="time"
-            label="Time"
-            width="200"
-            :filters="[{ text: 'Morning', value: 'Morning' }, { text: 'Afternoon', value: 'Afternoon' }]"
-            :filter-method="filterTag"
-            filter-placement="bottom-end">
-            <template slot-scope="scope">
-                <el-tag
-                :type="scope.row.tag === 'Morning' ? 'primary' : 'success'"
-                disable-transitions>{{scope.row.tag}}</el-tag>
-            </template>
-            </el-table-column> -->
     </el-table>
   </div>
 </template>
@@ -62,16 +49,7 @@ import axios from "axios";
 export default {
   data() {
     return {
-      tableData: [
-        {
-          date: "2016-05-03",
-          name: "Tom",
-          address: "No. 189, Grove St, Los Angeles",
-          department: "AAA",
-          doctor: "wow",
-          tag: "Morning",
-        },
-      ],
+      appointment_list: [], // list of appoint
       // tableData : [], // all available appointments, requested from the backend as json data
       dates: ["2016-05-03"], // all available dates, requested from the backend as a list
       departments: ["AAA"], // all available departments, requested from the backend as a list
@@ -83,14 +61,12 @@ export default {
   },
   mounted() {
     axios
-      .post("api/appointment/filter_appointment", {
-        doctor_id: sessionStorage.getItem("id"),
+      .post("api/appointment/filter_appointment/", {
+        doctor_id: sessionStorage.getItem("id")
       })
       .then((resp) => {
-        console.log("resp: ", resp);
-        var tableNum = resp.number;
-        this.tableData = resp.record_data;
-        console.log("table num: ", tableNum);
+        var data = resp.data.record_data;
+        this.appointment_list = data.record_data;
         // this.dates = resp.dates;
         // this.departments = resp.departments;
         // this.doctors = resp.doctors

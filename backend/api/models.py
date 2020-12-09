@@ -92,6 +92,5 @@ class Appointment(models.Model):
     dateTime = models.DateTimeField(blank=False)
     submitTime = models.DateTimeField(blank=False)
 
-
     class Meta:
         db_table = 'appointment'

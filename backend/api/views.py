@@ -45,7 +45,7 @@ def login(request):
         { id: 1,
             username: "frank",
             password: "frank",
-            role    : "patient"} 
+            role    : "patient"}
 
     """
     data = JSONParser().parse(request)
@@ -109,16 +109,16 @@ ModelViewSet
 
     I. Path = api/...
         (e.g. localhost:8000/api/personal_info/)
-        
+
         Accept Methods: 'GET', 'POST'
-        
+
         If request.method == 'GET':
             (return all the records in the table)
 
             Response Status:
                 200: OK
                 others: Bug in the code
-            
+
             Respose Format: (JSON)
                 {
                     {
@@ -133,7 +133,7 @@ ModelViewSet
                     },
                     ...
                 }
-            
+
         If request.method == 'Post':
             (create new record using the passed data)
 
@@ -145,7 +145,7 @@ ModelViewSet
             Response Status:
                 201: Created
                 400: Creation Failed
-            
+
             Respose Format of 400: (JSON)
             {
             FIELD: [
@@ -154,7 +154,7 @@ ModelViewSet
             }
 
     II. path: PATH/<int:id> (e.g. localhost:8000/api/personal_info/3/)
-        
+
         Accept Methods: 'GET', 'PUT', 'DELETE', 'PATCH'
 
         If request.method == 'GET':
@@ -163,7 +163,7 @@ ModelViewSet
             Response Status:
                 200: OK
                 404: Not Found
-            
+
             Response Formate of 200: (JSON)
                     {
                         record_column1: ...,
@@ -182,7 +182,7 @@ ModelViewSet
                 200: OK
                 404: Not Found
                 400: Update Failed
-        
+
             Response Format: (JSON)
                 The Request JSON
 
@@ -420,15 +420,15 @@ class AppViewSet(viewsets.ModelViewSet):
         q = Appointment.objects.filter(**data).values()
         record_data = list(q)
         for record in record_data:
-            dept = get_department(record["doctor_id"]).department
-            record.update({"department":dept})
+            # get object DartmentInfo(models.Model)
+            departmentInfo = get_department(record["doctor_id"])
+            personInfo = get_person_info(record["patient_id"])
+            patient_name = personInfo.name
+            record.update({"department":departmentInfo.department, "patient_name": patient_name})
         return_data = {"record_num":len(record_data), "record_data":record_data}
         return Response(data=return_data, status=HTTP_200_OK)
 
-        
-                
 
-            
 
 # Assistant Functions
 def get_person_info(id):
