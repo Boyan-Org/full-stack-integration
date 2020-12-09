@@ -2,9 +2,9 @@
   <div>
     <h1>Department: {{ department }}</h1>
     <h1>Supervisor: {{ supervisor }}</h1>
-    <el-collapse v-model="activeNames" @change="handleChange">
+    <el-collapse v-model="activeNames">
       <el-collapse-item title="Schedule" name="1">
-        <Calendar is-expanded :attributes="attrs" />
+        <Calendar is-expanded :attributes="attrs"/>
       </el-collapse-item>
     </el-collapse>
   </div>
@@ -23,36 +23,38 @@ export default {
       supervisor: "",
       activeNames: [],
       work: [],
-      attrs: [
-        {
-          key: "today",
-          highlight: true,
-          dates: {
-            start: new Date(2000, 0, 1), // Jan 1st, 2018
-            // end: new Date(2021, 0, 1), // Jan 1st, 2019
-            weekdays: [],
-          },
-        },
-      ],
+      dates:[],
     };
   },
   components: {
     Calendar,
   },
-  created() {
+  computed:{
+    attrs: function(){
+      console.log(this.dates);
+      return [
+        {
+          key: 'today',
+          highlight: true,
+          dates: { weekdays: this.dates },
+        },
+      ]
+    }
+  },
+  mounted() {
     axios
       .get(
         "../api/department_information/" + sessionStorage.getItem("id") + "/"
       )
       .then((resp) => {
+        // console.log(JSON.parse(resp.data.workingHour));
         this.department = resp.data.department;
         this.supervisor = resp.data.supervisor;
         this.work = JSON.parse(resp.data.workingHour);
-        console.log(this.work);
         for (let i = 0; i < 7; i++) {
           const element = this.work[i];
           if (element[0] || element[1]) {
-            this.attrs[0].dates.weekdays.push(i + 1);
+            this.dates.push(i + 1);
           }
         }
       })
@@ -64,15 +66,6 @@ export default {
           this.$message.error("Record does not exist!");
         }
       });
-  },
-  mounted() {
-    console.log(this.attrs[0].dates.weekdays);
-  },
-  methods: {
-    handleChange() {
-      console.log(this.attrs[0].dates);
-      this.attrs[0].dates.weekdays=[1,2,3];
-    },
   },
 };
 </script>
