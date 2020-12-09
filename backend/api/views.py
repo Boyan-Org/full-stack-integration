@@ -359,14 +359,14 @@ class AppViewSet(viewsets.ModelViewSet):
     def create(self, request):
         """
         patient book appointment with a doctor.
-        
+
         Request Json:
 
             {
                 "date":"2020-11-29",
                 "time": "morning",
                 "submitTime":"2020-11-28T22:00:00",
-                "doctor":2, 
+                "doctor":2,
                 "patient":1
             }
 
@@ -552,7 +552,7 @@ class AppViewSet(viewsets.ModelViewSet):
         slots = []
         for dept_info in dept_infos:
             slots += two_week_working_hour(dept_info)
-        
+
         i = 0
         while i < len(slots):
             slot = slots[i]

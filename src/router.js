@@ -6,6 +6,8 @@ import LoginForm from "./components/LoginForm.vue";
 import RegForm from "./components/RegForm.vue";
 import Dashboard from "./components/Dashboard"
 import AccountInput from "./components/AccountInput.vue";
+// import Med from "./components/Med.vue";
+
 
 
 import InfoBoard from "./components/InfoBoard.vue";
@@ -82,12 +84,12 @@ export default new Router({
       path: '/record', component: Dashboard, children: [ //view record list
         { path: '', component: RecordFilter }
       ]
-    }, 
+    },
     {
       path: '/record/:id', component: Dashboard, children: [ //view record list
         { path: '', component: RecordView }
       ]
-    }, 
+    },
     {
       path: '/record/edit/:id', component: Dashboard, children: [
         { path: '', component: RecordEdit }
