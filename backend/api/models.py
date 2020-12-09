@@ -89,9 +89,15 @@ class Appointment(models.Model):
     appointmentID = models.AutoField(primary_key=True)
     patient = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='patient_id')
     doctor = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctor_id')
-    dateTime = models.DateTimeField(blank=False)
+    date = models.DateField(blank=False)
+    time = models.CharField(
+        max_length=10,
+        blank=False,
+        choices=(
+            ('morning', 'morning'),
+            ('afternoon', 'afternoon'),
+        ))
     submitTime = models.DateTimeField(blank=False)
-
 
     class Meta:
         db_table = 'appointment'

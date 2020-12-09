@@ -133,14 +133,14 @@ export default {
       var params = {
         id: this.id,
         address: this.form.addr,
-        dateOfBirth: year + "-" + month + "-" + day + "T00:00:00",
+        dateOfBirth: year + "-" + month + "-" + day,
         email: this.form.email,
         gender: this.form.gender,
         maritalStatus: this.form.marital,
         name: this.form.name,
         phoneNumber: this.form.phone,
       };
-      console.log(year + "-" + month + "-" + day + "T00:00:00");
+      console.log(year + "-" + month + "-" + day);
       axios
         .patch("../api/personal_information/" + this.id + "/", params)
         .then((resp) => {
