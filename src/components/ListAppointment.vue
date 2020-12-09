@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-table ref="filterTable" :data="c" style="width: 100%">
+    <el-table ref="filterTable" :data="appointment_list" style="width: 100%">
       <!-- date column  -->
 
       <el-table-column
@@ -22,8 +22,44 @@
       </el-table-column>
 
       <el-table-column
+        prop="time"
+        label="Time"
+        sortable
+        width="300"
+        column-key="time"
+      >
+      </el-table-column>
+
+      <el-table-column
+        prop="submitTime"
+        label="submitTime"
+        sortable
+        width="300"
+        column-key="submitTime"
+      >
+      </el-table-column>
+
+      <el-table-column
+        prop="doctor_name"
+        label="Doctor Name"
+        sortable
+        width="300"
+        column-key="doctor_name"
+      >
+      </el-table-column>
+
+      <el-table-column
         prop="patient_name"
-        label="Patient ID"
+        label="Patient Name"
+        sortable
+        width="300"
+        column-key="patient_name"
+      >
+      </el-table-column>
+
+      <el-table-column
+        prop="patient_name"
+        label="Patient Name"
         sortable
         width="300"
         column-key="patient_name"
@@ -65,8 +101,7 @@ export default {
         doctor_id: sessionStorage.getItem("id")
       })
       .then((resp) => {
-        var data = resp.data.record_data;
-        this.appointment_list = data.record_data;
+        this.appointment_list = resp.data.record_data;
         // this.dates = resp.dates;
         // this.departments = resp.departments;
         // this.doctors = resp.doctors
