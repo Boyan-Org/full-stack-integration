@@ -359,12 +359,21 @@ class AppViewSet(viewsets.ModelViewSet):
     def create(self, request):
         """
         patient book appointment with a doctor.
+        
+        Request Json:
+
+            {
+                "date":"2020-11-29",
+                "time": "morning",
+                "submitTime":"2020-11-28T22:00:00",
+                "doctor":2, 
+                "patient":1
+            }
 
         Response status:
             406: Data not acceptable
             409: condition not satisfied (check response.data["error"])
             201: Created
-
         """
         serializer = AppSerializer(data=request.data)
         if not serializer.is_valid():
@@ -385,7 +394,7 @@ class AppViewSet(viewsets.ModelViewSet):
         # check availability
         if not workingHour[weekday][time_num]:
             return Response(
-            data={"error:":"doctor is not available"},
+            data={"error":"doctor is not available"},
             status=status.HTTP_409_CONFLICT
             )
 
@@ -543,8 +552,8 @@ class AppViewSet(viewsets.ModelViewSet):
         slots = []
         for dept_info in dept_infos:
             slots += two_week_working_hour(dept_info)
-        print(slots)
-
+        # print(slots)
+        
         for slot in slots:
             doctor_id = slot["doctor_id"]
             date = slot["date"]
