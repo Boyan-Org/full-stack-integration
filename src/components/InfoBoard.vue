@@ -37,7 +37,8 @@ export default {
   },
   methods: {
     handleClick(tab) {
-      console.log(tab);
+      return tab;
+      // console.log(tab);
       // console.log(event);
     },
   },
