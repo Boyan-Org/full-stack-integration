@@ -25,7 +25,7 @@ import RecordCreate from "./components/RecordCreate.vue";
 Vue.use(Router)
 
 export default new Router({
-  mode: 'history',
+  // mode: 'history',
   routes: [
     {
       path: '/login',

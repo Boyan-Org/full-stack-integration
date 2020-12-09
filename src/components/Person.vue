@@ -85,9 +85,9 @@ export default {
   },
   mounted() {
     axios
-      .get("../api/personal_information/" + this.id)
+      .get("../api/personal_information/" + this.id+"/")
       .then((resp) => {
-        console.log(resp.data);
+        // console.log(resp.data);
         // address: "";
         // dateOfBirth: "";
         // email: "";
@@ -142,7 +142,7 @@ export default {
       };
       console.log(year + "-" + month + "-" + day);
       axios
-        .put("../api/personal_information/" + this.id + "/", params)
+        .patch("../api/personal_information/" + this.id + "/", params)
         .then((resp) => {
           var data = resp.data;
           var form = this.form;

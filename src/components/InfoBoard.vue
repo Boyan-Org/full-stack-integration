@@ -1,10 +1,20 @@
 <template>
   <el-tabs v-model="activeName" @tab-click="handleClick">
-    <el-tab-pane label="Personal Info" name="first"><Person /></el-tab-pane>
-    <el-tab-pane v-if="user.role == 'patient'" label="Medical Info" name="second"
-      ><Med
-    /></el-tab-pane>
-    <el-tab-pane v-else label="Schedule" name="third"><Schedule /></el-tab-pane>
+    <el-tab-pane label="Personal Info" name="first">
+      <transition name="el-fade-in"
+        ><Person v-show="activeName == 'first'" /></transition
+    ></el-tab-pane>
+    <el-tab-pane
+      v-if="user.role == 'patient'"
+      label="Medical Info"
+      name="second"
+      ><transition name="el-fade-in"
+        ><Med v-show="activeName == 'second'" /></transition
+    ></el-tab-pane>
+    <el-tab-pane v-else label="Schedule" name="third"
+      ><transition name="el-fade-in"
+        ><Schedule v-show="activeName == 'third'" /></transition
+    ></el-tab-pane>
   </el-tabs>
 </template>
 
@@ -17,7 +27,7 @@ export default {
     return {
       activeName: "first",
       role: "doctor",
-      user: {}
+      user: {},
     };
   },
   components: {
@@ -26,8 +36,10 @@ export default {
     Schedule,
   },
   methods: {
-    handleClick(tab, event) {
-      console.log(tab, event);
+    handleClick(tab) {
+      return tab;
+      // console.log(tab);
+      // console.log(event);
     },
   },
   created: function () {
