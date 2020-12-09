@@ -26,11 +26,11 @@
       </el-table-column>
 
       <el-table-column
-        prop="doctor"
+        prop="doctor_name"
         label="Doctor"
         sortable
         width="240"
-        column-key="doctor"
+        column-key="doctor_name"
         :filters="doctorsFilter"
         :filter-method="filterHandler"
       >
@@ -40,18 +40,16 @@
         prop="time"
         label="Time"
         width="200"
-        :filters="[
-          { text: 'Morning', value: 'Morning' },
-          { text: 'Afternoon', value: 'Afternoon' },
-        ]"
+        column-key="time"
+        :filters="timeFilter"
         :filter-method="filterTag"
         filter-placement="bottom-end"
       >
         <template slot-scope="scope">
           <el-tag
-            :type="scope.row.tag === 'Morning' ? 'primary' : 'success'"
+            :type="scope.row.time === 'morning' ? 'primary' : 'success'"
             disable-transitions
-            >{{ scope.row.tag }}</el-tag
+            >{{ scope.row.time }}</el-tag
           >
         </template>
       </el-table-column>
@@ -68,41 +66,54 @@
 </template>
 
 <script>
-// import axios from "axios";
+import axios from "axios";
 export default {
   data() {
     return {
       available_slots: [],
-      dates: ["2016-05-01", "2016-05-02", "2016-05-03"], // all available dates, requested from the backend as a list
-      departments: ["AAA", "BBB", "CCC"], // all available departments, requested from the backend as a list
-      doctors: ["wow", "kak"], // all available doctors, requested from the backend as a list
       datesFilter: [],
       departmentsFilter: [],
       doctorsFilter: [],
+      timeFilter: [],
     };
   },
   mounted() {
-    var date, department, doc;
+    axios
+      .post("api/appointment/get_available_slots/", {
+        patient_id: sessionStorage.getItem("id")
+      })
+      .then((resp) => {
+        this.available_slots = resp.data.slots;
 
-    for (date in this.dates) {
-      this.datesFilter.push({
-        text: this.dates[date],
-        value: this.dates[date],
+        for (let i=0; i<resp.data.dates.length; i++) {
+          var date = resp.data.dates[i];
+          this.datesFilter.push({
+            text: date,
+            value: date,
+          });
+        }
+        for (let i=0; i<resp.data.dept_names.length; i++) {
+          var dept_name = resp.data.dept_names[i];
+          this.departmentsFilter.push({
+            text: dept_name,
+            value: dept_name,
+          });
+        }
+        for (let i=0; i<resp.data.doctor_names.length; i++) {
+          var doctor_name = resp.data.doctor_names[i];
+          this.doctorsFilter.push({
+            text: doctor_name,
+            value: doctor_name,
+          });
+        }
+        for (let i=0; i<resp.data.times.length; i++) {
+          var time = resp.data.times[i];
+          this.timeFilter.push({
+            text: time,
+            value: time,
+          });
+        }
       });
-    }
-    for (department in this.departments) {
-      this.departmentsFilter.push({
-        text: this.departments[department],
-        value: this.departments[department],
-      });
-    }
-    for (doc in this.doctors) {
-      this.doctorsFilter.push({
-        text: this.doctors[doc],
-        value: this.doctors[doc],
-      });
-    }
-    console.log(this.datesFilter);
   },
 
   methods: {
@@ -125,26 +136,6 @@ export default {
     // make an appointment
     handleBook(index, row) {
       console.log(index, row);
-      // contact the server to make this appointment (create)
-
-      // prompt: the user has successfully made an appointment
-
-      // router: go back to the homepage of the dashboard
-
-      //   contact server to make this appointment
-      //   axios
-      //     .put("api/appointment/"{
-      //         {doctorName: row["doctorName"],
-      //          department: row["department"]
-      // }
-      // })
-      //     .then((resp) => {
-      //         // var tableNum = resp.number;
-      //         this.tableData = resp.appointments;
-      //         this.dates = resp.dates;
-      //         this.departments = resp.departments;
-      //         this.doctors = resp.doctors
-      //     })
     },
   },
 };
