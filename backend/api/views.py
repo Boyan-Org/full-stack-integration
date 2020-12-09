@@ -552,21 +552,25 @@ class AppViewSet(viewsets.ModelViewSet):
         slots = []
         for dept_info in dept_infos:
             slots += two_week_working_hour(dept_info)
-        # print(slots)
         
-        for slot in slots:
+        i = 0
+        while i < len(slots):
+            slot = slots[i]
             doctor_id = slot["doctor_id"]
             date = slot["date"]
             time = slot["time"]
             appointments = Appointment.objects.filter(doctor_id=doctor_id, date=date, time=time)
             # filter the slots by maximum number of appointments
             if len(list(appointments))>=10:
+                i-=1
                 slots.remove(slot)
                 continue
             # filter the slots by whether the patient has booked an appointment with the doctor
             appointments.filter(patient_id=data["patient_id"])
             if len(list(appointments))!=0:
+                i-=1
                 slots.remove(slot)
+            i+=1
         # extract the unique information
         dept_names = list(set([slot["department"] for slot in slots]))
         doctor_names = list(set([slot["doctor_name"] for slot in slots]))
@@ -611,7 +615,7 @@ def two_week_working_hour(dept_info):
     today = datetime.datetime.today()
     weekday = today.weekday()
     workingHour = json.loads(dept_info.workingHour)
-    # print(type(workingHour), workingHour)
+
     schedule = []
     for i in range(14):
         if workingHour[(weekday+i+1)%7][0]:
