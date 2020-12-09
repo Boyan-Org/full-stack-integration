@@ -45,7 +45,7 @@ def login(request):
         { id: 1,
             username: "frank",
             password: "frank",
-            role    : "patient"} 
+            role    : "patient"}
 
     """
     data = JSONParser().parse(request)
@@ -112,7 +112,7 @@ def register(request):
             except:
                 account.delete()
                 return Response(data={"error":"fail to auto-create dept_info"}, status=status.HTTP_417_EXPECTATION_FAILED)
-  
+
         personal_info.save()
         return Response(status=status.HTTP_201_CREATED)
     else:
@@ -128,16 +128,16 @@ ModelViewSet
 
     I. Path = api/...
         (e.g. localhost:8000/api/personal_info/)
-        
+
         Accept Methods: 'GET', 'POST'
-        
+
         If request.method == 'GET':
             (return all the records in the table)
 
             Response Status:
                 200: OK
                 others: Bug in the code
-            
+
             Respose Format: (JSON)
                 {
                     {
@@ -152,7 +152,7 @@ ModelViewSet
                     },
                     ...
                 }
-            
+
         If request.method == 'Post':
             (create new record using the passed data)
 
@@ -164,7 +164,7 @@ ModelViewSet
             Response Status:
                 201: Created
                 400: Creation Failed
-            
+
             Respose Format of 400: (JSON)
             {
             FIELD: [
@@ -173,7 +173,7 @@ ModelViewSet
             }
 
     II. path: PATH/<int:id> (e.g. localhost:8000/api/personal_info/3/)
-        
+
         Accept Methods: 'GET', 'PUT', 'DELETE', 'PATCH'
 
         If request.method == 'GET':
@@ -182,7 +182,7 @@ ModelViewSet
             Response Status:
                 200: OK
                 404: Not Found
-            
+
             Response Formate of 200: (JSON)
                     {
                         record_column1: ...,
@@ -201,7 +201,7 @@ ModelViewSet
                 200: OK
                 404: Not Found
                 400: Update Failed
-        
+
             Response Format: (JSON)
                 The Request JSON
 
@@ -250,7 +250,7 @@ class MRViewSet(viewsets.ModelViewSet):
             return Response(data={"record_id":record_id}, status=status.HTTP_200_OK)
         else:
             return Response(data=request.data, status=status.HTTP_406_NOT_ACCEPTABLE)
-        
+
 
     def retrieve(self, request, pk=None):
         """
@@ -464,7 +464,7 @@ class AppViewSet(viewsets.ModelViewSet):
     def get_available_slots(self, request):
         """
         PATH: http://127.0.0.1:8000/api/appointment/get_available_slots/
-        Note: 
+        Note:
             The slot is available if and only if:
                 1). The doctor works at that slot
                 2). There are less than 10 people book the slot with the doctor
@@ -544,7 +544,7 @@ class AppViewSet(viewsets.ModelViewSet):
         for dept_info in dept_infos:
             slots += two_week_working_hour(dept_info)
         print(slots)
-        
+
         for slot in slots:
             doctor_id = slot["doctor_id"]
             date = slot["date"]
@@ -597,7 +597,7 @@ def get_department(id):
 
 def two_week_working_hour(dept_info):
     """
-    convert workingHour into two week's everyday slot 
+    convert workingHour into two week's everyday slot
     """
     today = datetime.datetime.today()
     weekday = today.weekday()
@@ -622,5 +622,5 @@ def two_week_working_hour(dept_info):
                 "department": dept_info.department,
             })
     return schedule
-    
+
 

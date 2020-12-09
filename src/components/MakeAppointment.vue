@@ -161,6 +161,16 @@
       // make an appointment
       handleBook(index, row) {
         console.log(index, row);
+        // contact the server to make this appointment (create)
+
+        // prompt: the user has successfully made an appointment
+
+        // router: go back to the homepage of the dashboard
+
+        
+
+
+
             //   contact server to make this appointment
     //   axios
     //     .put("api/appointment/"{
