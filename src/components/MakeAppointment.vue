@@ -125,6 +125,45 @@ export default {
       return row.address;
     },
 
+    updatePage(){
+      axios
+      .post("api/appointment/get_available_slots/", {
+        patient_id: sessionStorage.getItem("id")
+      })
+      .then((resp) => {
+        this.available_slots = resp.data.slots;
+
+        for (let i=0; i<resp.data.dates.length; i++) {
+          var date = resp.data.dates[i];
+          this.datesFilter.push({
+            text: date,
+            value: date,
+          });
+        }
+        for (let i=0; i<resp.data.dept_names.length; i++) {
+          var dept_name = resp.data.dept_names[i];
+          this.departmentsFilter.push({
+            text: dept_name,
+            value: dept_name,
+          });
+        }
+        for (let i=0; i<resp.data.doctor_names.length; i++) {
+          var doctor_name = resp.data.doctor_names[i];
+          this.doctorsFilter.push({
+            text: doctor_name,
+            value: doctor_name,
+          });
+        }
+        for (let i=0; i<resp.data.times.length; i++) {
+          var time = resp.data.times[i];
+          this.timeFilter.push({
+            text: time,
+            value: time,
+          });
+        }
+      });
+    },
+
     filterTag(value, row) {
       return row.tag === value;
     },
@@ -135,7 +174,39 @@ export default {
 
     // make an appointment
     handleBook(index, row) {
-      console.log(index, row);
+
+      let doctor_id = row.doctor_id;
+      let patient_id = sessionStorage.getItem("id");
+      let date = row.date;
+      let time = row.time;
+
+      function setDateZero(date){
+          return date < 10 ? '0' + date : date;
+        }
+
+      let now = new Date(Date.now());
+      var year = now.getFullYear();
+      var month = setDateZero(now.getMonth() + 1);
+      var day = setDateZero(now.getDate());
+      var timeString = now.toLocaleTimeString([],{hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'})
+
+      let submitTime = year + "-" + month + "-" + day + "T" + timeString;
+      console.log(row.doctor_id);
+      axios
+        .post("api/appointment/", {
+          doctor: doctor_id,
+          patient: patient_id,
+          date: date,
+          time:time,
+          submitTime: submitTime,
+        })
+        .then(()=>{
+          this.$message({
+            message: 'Congrats! Appointment Booked!',
+            type: 'success'
+            });
+          this.updatePage();
+        })
     },
   },
 };
