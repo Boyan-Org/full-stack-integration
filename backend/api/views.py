@@ -89,11 +89,30 @@ def register(request):
         409: `Username` already taken by someone else
     """
     data = JSONParser().parse(request)
-    name = data['name']
+    try:
+        name = data['name']
+        role = data['role']
+    except:
+        return Response(data={"error":"missing register information"}, status=status.HTTP_404_NOT_FOUND)
     serializer = AccountSerializer(data=data)
     if serializer.is_valid():
         account = serializer.save()
         personal_info = PersonalInfo(name=name, id=account)
+        if role == 'patient':
+            try:
+                medical_info = MedicalInfo(id=account)
+                medical_info.save()
+            except:
+                account.delete()
+                return Response(data={"error":"fail to auto-create medical_info"}, status=status.HTTP_417_EXPECTATION_FAILED)
+        else:
+            try:
+                dept_info = DepartmentInfo(id=account)
+                dept_info.save()
+            except:
+                account.delete()
+                return Response(data={"error":"fail to auto-create dept_info"}, status=status.HTTP_417_EXPECTATION_FAILED)
+
         personal_info.save()
         return Response(status=status.HTTP_201_CREATED)
     else:
@@ -224,6 +243,15 @@ class MRViewSet(viewsets.ModelViewSet):
     queryset = MedicalRecord.objects.all()
     serializer_class = MRSerializer
 
+    def create(self, request):
+        serializer = MRSerializer(data=request.data)
+        if serializer.is_valid():
+            record_id = serializer.save().recordID
+            return Response(data={"record_id":record_id}, status=status.HTTP_200_OK)
+        else:
+            return Response(data=request.data, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+
     def retrieve(self, request, pk=None):
         """
         Modified ModelViewSet.retrieve()
@@ -343,24 +371,29 @@ class AppViewSet(viewsets.ModelViewSet):
             return Response(data=request.data, status=status.HTTP_406_NOT_ACCEPTABLE)
         doctor_id = request.data['doctor']
         patient_id = request.data['patient']
-        dateTime = request.data['dateTime']
-        workingHour = json.loads(DepartmentInfo.objects.get(id=doctor_id).workingHour)
-        dateTime = datetime.datetime.strptime(dateTime, '%Y-%m-%dT%H:%M:%S')
-        weekday = dateTime.weekday()
-        time = 0 if dateTime.hour<12 else 1
+        date = request.data['date']
+        time = request.data['time']
+
+        workingHour = get_department(doctor_id).workingHour
+        if len(workingHour) == 0:
+            return Response(data={"error":"doctor working hour missing"}, status=HTTP_404_NOT_FOUND)
+        workingHour = json.loads(workingHour)
+        date = datetime.datetime.strptime(date, '%Y-%m-%d')
+        weekday = date.weekday()
+        time_num = 0 if time=='morning' else 1
 
         # check availability
-        if not workingHour[weekday][time]:
+        if not workingHour[weekday][time_num]:
             return Response(
             data={"error:":"doctor is not available"},
             status=status.HTTP_409_CONFLICT
             )
 
         # check whether too many patients in a slot (maximum 10)
-        appointments = Appointment.objects.filter(doctor_id=doctor_id, dateTime=dateTime)
+        appointments = Appointment.objects.filter(doctor_id=doctor_id, date=date, time=time)
         if len(list(appointments))>=10:
             return Response(
-                    data={"error":"more than one appointment in a slot"},
+                    data={"error":"more than ten appointment in a slot"},
                     status=status.HTTP_409_CONFLICT,
                 )
 
@@ -373,8 +406,8 @@ class AppViewSet(viewsets.ModelViewSet):
                 )
         # everything ok then create
         if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            app = serializer.save()
+            return Response(data = {"appointment_id":app.appointmentID}, status=status.HTTP_201_CREATED)
         return Response(data=request.data, status=status.HTTP_406_NOT_ACCEPTABLE)
 
     @action(detail=False, methods=['POST'])
@@ -390,27 +423,22 @@ class AppViewSet(viewsets.ModelViewSet):
                 ...
             }
         Response JSON:
-            {
-                "record_num": 2,
-                "record_data": [
-                    {
-                        "appointmentID": 1,
-                        "dateTime": "2020-11-29T14:00:00",
-                        "department": "dept1",
-                        "doctor_id": 2,
-                        "patient_id": 1,
-                        "submitTime": "2020-11-28T22:00:00"
-                    },
-                    {
-                        "appointmentID": 2,
-                        "dateTime": "2020-11-30T14:00:00",
-                        "department": "dept1",
-                        "doctor_id": 2,
-                        "patient_id": 1,
-                        "submitTime": "2020-11-28T22:00:00"
-                    }
-                ],
-            }
+                {
+                    "record_data": [
+                        {
+                            "appointmentID": 2,
+                            "date": "2020-12-02",
+                            "department": "dept1",
+                            "doctor_id": 2,
+                            "doctor_name": "Boyan Xu",
+                            "patient_id": 1,
+                            "patient_name": "Frank Zhou",
+                            "submitTime": "2020-11-28T22:00:00",
+                            "time": "morning"
+                        }
+                    ],
+                    "record_num": 1
+                }
         """
         data = JSONParser().parse(request)
         # get rid of NULL values
@@ -420,15 +448,129 @@ class AppViewSet(viewsets.ModelViewSet):
         q = Appointment.objects.filter(**data).values()
         record_data = list(q)
         for record in record_data:
-            # get object DartmentInfo(models.Model)
-            departmentInfo = get_department(record["doctor_id"])
-            personInfo = get_person_info(record["patient_id"])
-            patient_name = personInfo.name
-            record.update({"department":departmentInfo.department, "patient_name": patient_name})
+            dept = get_department(record["doctor_id"]).department
+            patient_name = get_person_info(record["patient_id"]).name
+            doctor_name = get_person_info(record["doctor_id"]).name
+            record.update({
+                "department":dept,
+                "patient_name":patient_name,
+                "doctor_name":doctor_name,
+            })
+
         return_data = {"record_num":len(record_data), "record_data":record_data}
         return Response(data=return_data, status=HTTP_200_OK)
 
+    @action(detail=False, methods=['POST'])
+    def get_available_slots(self, request):
+        """
+        PATH: http://127.0.0.1:8000/api/appointment/get_available_slots/
+        Note:
+            The slot is available if and only if:
+                1). The doctor works at that slot
+                2). There are less than 10 people book the slot with the doctor
+                3). The patient has not booked the slot with the doctor
+        Request Json:
+            {
+                "patient_id": 1,
+            }
+        Response Json:
+            {
+                "dates": [
+                    "2020-12-14",
+                    "2020-12-11",
+                    "2020-12-07",
+                    "2020-12-17",
+                    "2020-12-04",
+                    "2020-12-13",
+                    "2020-12-10",
+                    "2020-12-09",
+                    "2020-12-06",
+                    "2020-12-16"
+                ],
+                "dept_names": [
+                    "dept2",
+                    "dept1"
+                ],
+                "doctor_names": [
+                    "Hellen Wang",
+                    "Boyan Xu"
+                ],
+                "slots": [
+                    {
+                        "date": "2020-12-04",
+                        "department": "dept1",
+                        "doctor_id": 2,
+                        "doctor_name": "Boyan Xu",
+                        "time": "morning"
+                    },
+                    ...,
+                    ...,
+                    {
+                        "date": "2020-12-17",
+                        "department": "dept1",
+                        "doctor_id": 2,
+                        "doctor_name": "Boyan Xu",
+                        "time": "afternoon"
+                    },
+                    {
+                        "date": "2020-12-04",
+                        "department": "dept2",
+                        "doctor_id": 3,
+                        "doctor_name": "Hellen Wang",
+                        "time": "morning"
+                    },
+                    ...,
+                    ...,
+                    {
+                        "date": "2020-12-17",
+                        "department": "dept2",
+                        "doctor_id": 3,
+                        "doctor_name": "Hellen Wang",
+                        "time": "afternoon"
+                    }
+                ],
+                "times": [
+                    "morning",
+                    "afternoon"
+                ]
+            }
+        """
+        data = JSONParser().parse(request)
+        if "patient_id" not in data:
+            return Response(data={"error":"patient identity missing"}, status=HTTP_404_NOT_FOUND)
+        # list all the slots filtered by workingHour
+        dept_infos = DepartmentInfo.objects.all()
+        slots = []
+        for dept_info in dept_infos:
+            slots += two_week_working_hour(dept_info)
+        print(slots)
 
+        for slot in slots:
+            doctor_id = slot["doctor_id"]
+            date = slot["date"]
+            time = slot["time"]
+            appointments = Appointment.objects.filter(doctor_id=doctor_id, date=date, time=time)
+            # filter the slots by maximum number of appointments
+            if len(list(appointments))>=10:
+                slots.remove(slot)
+                continue
+            # filter the slots by whether the patient has booked an appointment with the doctor
+            appointments.filter(patient_id=data["patient_id"])
+            if len(list(appointments))!=0:
+                slots.remove(slot)
+        # extract the unique information
+        dept_names = list(set([slot["department"] for slot in slots]))
+        doctor_names = list(set([slot["doctor_name"] for slot in slots]))
+        dates = list(set([slot["date"] for slot in slots]))
+        times = list(set([slot["time"] for slot in slots]))
+        return_data = {
+            "dept_names": dept_names,
+            "doctor_names": doctor_names,
+            "dates": dates,
+            "times": times,
+            "slots": slots,
+        }
+        return Response(data=return_data, status=status.HTTP_200_OK)
 
 # Assistant Functions
 def get_person_info(id):
@@ -452,4 +594,33 @@ def get_department(id):
         return Response(status=HTTP_404_NOT_FOUND)
     else:
         return info
+
+def two_week_working_hour(dept_info):
+    """
+    convert workingHour into two week's everyday slot
+    """
+    today = datetime.datetime.today()
+    weekday = today.weekday()
+    workingHour = json.loads(dept_info.workingHour)
+    # print(type(workingHour), workingHour)
+    schedule = []
+    for i in range(14):
+        if workingHour[(weekday+i+1)%7][0]:
+            schedule.append({
+                "date": (today+datetime.timedelta(days=i+1)).date(),
+                "time": "morning",
+                "doctor_id": dept_info.id.id,
+                "doctor_name": get_person_info(dept_info.id.id).name,
+                "department": dept_info.department,
+            })
+        if workingHour[(weekday+i+1)%7][1]:
+            schedule.append({
+                "date": (today+datetime.timedelta(days=i+1)).date(),
+                "time": "afternoon",
+                "doctor_id": dept_info.id.id,
+                "doctor_name": get_person_info(dept_info.id.id).name,
+                "department": dept_info.department,
+            })
+    return schedule
+
 
