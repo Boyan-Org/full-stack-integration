@@ -48,14 +48,6 @@
       >
       </el-table-column>
 
-      <el-table-column
-        prop="patient_name"
-        label="Patient Name"
-        sortable
-        width="300"
-        column-key="patient_name"
-      >
-      </el-table-column>
 
       <el-table-column
         prop="patient_name"
@@ -75,7 +67,6 @@
           >
         </template>
       </el-table-column>
-
     </el-table>
   </div>
 </template>
@@ -85,6 +76,7 @@ import axios from "axios";
 export default {
   data() {
     return {
+      recordID: 0,
       appointment_list: [], // list of appoint
       // tableData : [], // all available appointments, requested from the backend as json data
       dates: ["2016-05-03"], // all available dates, requested from the backend as a list
@@ -98,7 +90,7 @@ export default {
   mounted() {
     axios
       .post("api/appointment/filter_appointment/", {
-        doctor_id: sessionStorage.getItem("id")
+        doctor_id: sessionStorage.getItem("id"),
       })
       .then((resp) => {
         this.appointment_list = resp.data.record_data;
@@ -140,24 +132,43 @@ export default {
 
     // make a new medical record
     createRecord(index, row) {
-      console.log(index, row);
-      // contact the server to create a new medical record
+      console.log("row:", row);
+      function setDateZero(date) {
+        return date < 10 ? "0" + date : date;
+      }
+
+      let now = new Date(Date.now());
+      var year = now.getFullYear();
+      var month = setDateZero(now.getMonth() + 1);
+      var day = setDateZero(now.getDate());
+      var timeString = now.toLocaleTimeString([], {
+        hour12: false,
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+
+      let submitTime = year + "-" + month + "-" + day + "T" + timeString;
+
+      // Create new medical_record
       axios
-        .post("../../api/medical_record/" + row.patient_id, {
-          // dateTime: current_system_time,
-          doctor_id: sessionStorage.getItem("id"),
-          // patient_id: row.patient,
+        .post("/api/medical_record/", {
+          doctor: sessionStorage.getItem("id"),
+          patient: row.patient_id,
+          dateTime: submitTime,
+          flag: 0,
         })
         .then((resp) => {
           // router: go to RecordCreate
           // this.$router.push("/newRecord/" + row.patient_id + "/" + resp.medical_record_id);
-          console.log("create medical record resp: ", resp);
+          this.recordID = resp.data.record_id;
+          sessionStorage.setItem("recordID", this.recordID);
+          axios.delete("api/appointment/" + row.appointmentID + "/");
+          this.$router.push("/newRecord/" + row.patient_id + "/" + row.recordID);
         });
+
       // for testing only, will move to the "then" part and change "row.mri" to "resp.mri"
       // this.$router.push("/newRecord/" + row.patient_id + "/" + resp.medical_record_id);
-      this.$router.push(
-        "/newRecord/" + row.patient_id + "/" + row.medical_record_id
-      );
     },
   },
 };

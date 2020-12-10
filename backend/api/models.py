@@ -30,7 +30,7 @@ class PersonalInfo(models.Model):
     gender = models.CharField(max_length=100, blank=True)
     dateOfBirth = models.CharField(max_length=100,blank=True)
     email = models.CharField(max_length=100,blank=True)
-    phoneNumber = models.CharField(max_length=11,blank=True)
+    phoneNumber = models.CharField(max_length=100,blank=True)
     address = models.CharField(max_length=100,blank=True)
     maritalStatus = models.CharField(max_length=100,blank=True)
 
@@ -52,7 +52,7 @@ class MedicalInfo(models.Model):
     familyHistory = models.CharField(max_length=100, blank=True)
     surgicalHistory = models.CharField(max_length=100, blank=True)
     allergies = models.CharField(max_length=100, blank=True)
-    bloodType = models.CharField(max_length=1, blank=True)
+    bloodType = models.CharField(max_length=100, blank=True)
     habits = models.CharField(max_length=100, blank=True)
     class Meta:
         db_table = 'medical_info'
@@ -91,7 +91,7 @@ class Appointment(models.Model):
     doctor = models.ForeignKey(Account, on_delete=models.CASCADE, blank=False, related_name='+', db_column='doctor_id')
     date = models.DateField(blank=False)
     time = models.CharField(
-        max_length=10,
+        max_length=100,
         blank=False,
         choices=(
             ('morning', 'morning'),

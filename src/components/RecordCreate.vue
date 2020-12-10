@@ -97,7 +97,6 @@
 }
 </style>
 
-
 <script>
 import pdf from "vue-pdf";
 import router from "../router";
@@ -129,52 +128,8 @@ export default {
   },
   mounted() {
     if (sessionStorage.getItem("role") != "doctor") {
-          this.$message.error("Only doctor can create records!");
+      this.$message.error("Only doctor can create records!");
     }
-   
-    // this.recordID = this.$route.params.id; //QUESIONTS
-    // axios
-    //   .get("../../api/medical_record/" + this.recordID, {
-    //     recordID: this.recordID,
-    //   })
-    //   .then((resp) => {
-    //     // "attachmentNb": 0,
-    //     // "dateTime": "2020-11-29T00:17:34",
-    //     // "department": "dept1",
-    //     // "diagnosis": "d",
-    //     // "doctor_id": 2,
-    //     // "doctor_name": "Boyan Xu",
-    //     // "flag": false,
-    //     // "patient_birthday": "",
-    //     // "patient_gender": "",
-    //     // "patient_id": 1,
-    //     // "patient_name": "Frank Zhou",
-    //     // "recordID": 1,
-    //     // "symptoms": "s",
-    //     // "treatments": "t"
-    //     console.log(resp);
-    //     var rData = resp.data;
-    //     console.log(rData);
-    //     this.patientName = rData.patient_name;
-    //     this.doctorName = rData.doctor_name;
-    //     this.form.sym = rData.symptoms;
-    //     this.form.treat = rData.treatments;
-    //     this.form.diag = rData.diagnosis;
-    //     this.dept = rData.department;
-    //     this.patientDOB = Date.parse(rData.patient_birthday);
-    //     this.patientGender = rData.patient_gender;
-    //     this.recordTime = Date.parse(rData.dateTime);
-    //     this.totalPage = rData.attachmentNb + 1;
-    //     this.finalized = (rData.flag || sessionStorage.getItem("role") != "doctor");
-    //   })
-    //   .catch((error) => {
-    //     //error handling
-    //     console.log(error);
-    //     var loginCode = error.response.status;
-    //     if (loginCode == 404) {
-    //       this.$message.error("Record does not exist!");
-    //     }
-    //   });
 
     if (this.finalized) {
       this.$message.error(
@@ -183,7 +138,7 @@ export default {
     }
   },
   computed: {
-    patientAge: function () {
+    patientAge: function() {
       // birthday is a date
       var birthday = this.patientDOB;
       var ageDifMs = this.recordTime - birthday;
@@ -211,36 +166,34 @@ export default {
           type: "warning",
         }
       )
-        .then(() => {
-          this.submitRecord(true);
-          this.$message({
-            type: "success",
-            message: "Success!",
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Action cancelled!",
-          });
+      .then(() => {
+        this.submitRecord(true);
+        this.$message({
+          type: "success",
+          message: "Success!",
         });
+      })
+      .catch(() => {
+        this.$message({
+          type: "info",
+          message: "Action cancelled!",
+        });
+      });
     },
     submitRecord(finalize) {
-      var params = {
-        recordID: this.recordID,
-        diagnosis: this.form.diag,
-        treatments: this.form.treat,
-        symptoms: this.form.sym,
-        flag: finalize,
-      };
+      this.recordID = sessionStorage.getItem("recordID");
       axios
-        .patch("../../api/medical_record/" + this.recordID + "/", params)
+        .patch("../../api/medical_record/" + this.recordID + "/", {
+          recordID: this.recordID,
+          diagnosis: this.form.diag,
+          treatments: this.form.treat,
+          symptoms: this.form.sym,
+          flag: finalize,
+        })
         .then(() => {
-          router.push("/record/"+this.recordID);
+          router.push("/listAppointment");
         })
         .catch((error) => {
-          //error handling
-          console.log(error);
           var loginCode = error.response.status;
           if (loginCode == 404) {
             this.$message.error("Record does not exist!");
