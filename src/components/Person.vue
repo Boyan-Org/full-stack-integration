@@ -7,10 +7,10 @@
     label-width="100px"
   >
     <el-form-item label="Name" required="">
-      <el-input v-model="form.name"></el-input>
+      <el-input v-model="form.name" :disabled="doctorView"></el-input>
     </el-form-item>
     <el-form-item label="Gender" required="">
-      <el-select v-model="form.gender" :placeholder="form.gender">
+      <el-select v-model="form.gender" :placeholder="form.gender" :disabled="doctorView">
         <el-option label="Male" value="Male"></el-option>
         <el-option label="Female" value="Female"></el-option>
       </el-select>
@@ -24,6 +24,7 @@
             placeholder="YYYY-MM-DD"
             v-model="form.dob"
             style="width: 100%"
+             :disabled="doctorView"
           ></el-date-picker>
         </el-form-item>
       </el-col>
@@ -42,17 +43,17 @@
     </el-row>
 
     <el-form-item label="Email" required="">
-      <el-input v-model="form.email"></el-input>
+      <el-input v-model="form.email" :disabled="doctorView"></el-input>
     </el-form-item>
     <el-form-item label="Phone">
-      <el-input v-model="form.phone"></el-input>
+      <el-input v-model="form.phone" :disabled="doctorView"></el-input>
     </el-form-item>
     <el-form-item label="Address">
-      <el-input v-model="form.addr"></el-input>
+      <el-input v-model="form.addr" :disabled="doctorView"></el-input>
     </el-form-item>
 
     <el-form-item label="Marital status">
-      <el-select v-model="form.marital" placeholder="">
+      <el-select v-model="form.marital" placeholder="" :disabled="doctorView">
         <el-option label="Single" value="Single"></el-option>
         <el-option label="Married" value="Married"></el-option>
         <el-option label="Divorced" value="Divorced"></el-option>
@@ -61,7 +62,7 @@
     </el-form-item>
 
     <el-form-item>
-      <el-button type="primary" @click="submitForm()">Save</el-button>
+      <el-button type="primary" @click="submitForm()" v-if="!doctorView">Save</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -72,6 +73,7 @@ export default {
   data() {
     return {
       id: 0,
+      doctorView: false,
       form: {
         name: "",
         gender: "",
@@ -92,11 +94,12 @@ export default {
   mounted() {
     if (this.interview != -1) {
       this.id = this.interview;
+      this.doctorView = true;
     } else {
       this.id = sessionStorage.getItem("id");
     }
     axios
-      .get("../api/personal_information/" + this.id+"/")
+      .get("../api/personal_information/" + this.id + "/")
       .then((resp) => {
         // console.log(resp.data);
         // address: "";

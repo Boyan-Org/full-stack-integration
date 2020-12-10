@@ -67,6 +67,6 @@ export default {
 
 <style scoped>
 .el-tab-pane {
-  padding: 0 100px 0 100px;
+  padding: 0 10% 0 10%;
 }
 </style>

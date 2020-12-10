@@ -14,22 +14,22 @@
         <el-option label="O" value="O"></el-option>
       </el-select>
     </el-form-item>
-    <el-row>
-      <el-col :span="12">
+    <!-- <el-row>
+      <el-col :span="12"> -->
         <el-form-item label="Height">
           <el-input v-model="form.height">
             <template slot="append">cm</template>
           </el-input>
         </el-form-item>
-      </el-col>
-      <el-col :span="12">
+      <!-- </el-col>
+      <el-col :span="12"> -->
         <el-form-item label="Weight">
           <el-input v-model="form.weight">
             <template slot="append">kg</template>
           </el-input>
         </el-form-item>
-      </el-col>
-    </el-row>
+      <!-- </el-col>
+    </el-row> -->
 
     <el-form-item label="Medical Allergy">
       <el-input v-model="form.allergy"></el-input>
