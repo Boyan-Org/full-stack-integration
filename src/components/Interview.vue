@@ -9,7 +9,7 @@
     <el-row :gutter="20">
       <el-col :span="12">
         <el-card class="header">
-          <InfoBoard v-bind:interview="patient" />
+          <InfoBoard v-bind:interview="patient" v-if="patient!=-1"/>
         </el-card>
       </el-col>
       <el-col :span="12">
@@ -27,7 +27,7 @@ import InfoBoard from "./InfoBoard.vue";
 export default {
   data() {
     return {
-      patient: 1,
+      patient: -1,
       record: this.$route.params.id,
     };
   },
@@ -35,7 +35,7 @@ export default {
     RecordCreate,
     InfoBoard,
   },
-  mounted() {
+  created() {
     axios
       .get("../../api/medical_record/" + this.record, {
         recordID: this.record,
