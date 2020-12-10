@@ -25,7 +25,7 @@
           </table>
         </el-col>
         <el-col :span="1">
-            <el-button type="primary" icon="el-icon-edit" circle v-if="!finalized" @click="edit"></el-button>
+            <el-button type="primary" icon="el-icon-edit" circle v-if="!finalized && role != 'patient'" @click="edit"></el-button>
         </el-col>
       </el-row>
     </el-card>
@@ -101,6 +101,7 @@ import axios from "axios";
 export default {
   data() {
     return {
+      role: sessionStorage.getItem("role"),
       recordID: 0,
       patientName: "",
       patientDOB: Date.now(),
