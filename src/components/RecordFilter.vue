@@ -75,12 +75,11 @@
       @row-click="enterRecord"
       height="510px"
     >
-      <el-table-column prop="doctor_name" label="Doctor" width="180" sortable>
+      <el-table-column prop="doctor_name" label="Doctor" sortable>
       </el-table-column>
       <el-table-column
         prop="department"
         label="Department"
-        width="180"
         sortable
       >
       </el-table-column>

@@ -56,7 +56,7 @@ import axios from "axios";
 export default {
   data() {
     return {
-      id: sessionStorage.getItem("id"),
+      id: 0,
       form: {
         blood: "",
         height: "",
@@ -68,6 +68,12 @@ export default {
       },
     };
   },
+  props: {
+    interview: {
+      // type: Number,
+      default: -1,
+    },
+  },
   computed: {
     age: function () {
       // birthday is a date
@@ -78,7 +84,12 @@ export default {
     },
   },
   mounted() {
-    if (sessionStorage.getItem("role") != "patient") {
+    if (this.interview != -1) {
+      this.id= this.interview;
+    } else {
+      this.id = sessionStorage.getItem("id")
+    }
+    if (sessionStorage.getItem("role") != "patient" && this.interview == -1) {
       return;
     }
     axios

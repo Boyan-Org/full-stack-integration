@@ -1,87 +1,48 @@
 <template>
   <div>
-    <el-table ref="filterTable" :data="appointment_list" style="width: 100%">
-      <!-- date column  -->
+        <el-table
+          ref="filterTable"
+          :data="appointment_list"
+          style="width: 100%"
+        >
+          <!-- date column  -->
 
-      <el-table-column
-        prop="appointmentID"
-        label="appointmentID"
-        sortable
-        width="300"
-        column-key="appointmentID"
-      >
-      </el-table-column>
+          <el-table-column prop="date" label="Date" sortable column-key="date">
+          </el-table-column>
 
-      <el-table-column
-        prop="date"
-        label="Date"
-        sortable
-        width="300"
-        column-key="date"
-      >
-      </el-table-column>
-
-      <el-table-column
-        prop="time"
-        label="Time"
-        sortable
-        width="300"
-        column-key="time"
-      >
-      </el-table-column>
-
-      <el-table-column
-        prop="submitTime"
-        label="submitTime"
-        sortable
-        width="300"
-        column-key="submitTime"
-      >
-      </el-table-column>
-
-      <el-table-column
-        prop="doctor_name"
-        label="Doctor Name"
-        sortable
-        width="300"
-        column-key="doctor_name"
-      >
-      </el-table-column>
-
-
-      <el-table-column
-        prop="patient_name"
-        label="Patient Name"
-        sortable
-        width="300"
-        column-key="patient_name"
-      >
-      </el-table-column>
-
-      <el-table-column width="300" label="Operations">
-        <template slot-scope="scope">
-          <el-button
-            size="medium"
-            @click="createRecord(scope.$index, scope.row)"
-            >Check</el-button
+          <el-table-column
+            prop="patient_name"
+            label="Patient Name"
+            sortable
+            column-key="patient_name"
           >
-        </template>
-      </el-table-column>
-    </el-table>
+          </el-table-column>
+
+          <el-table-column label="Operations">
+            <template slot-scope="scope">
+              <el-button
+                size="medium"
+                @click="createRecord(scope.$index, scope.row)"
+                >Check</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+
 export default {
   data() {
     return {
       recordID: 0,
       appointment_list: [], // list of appoint
       // tableData : [], // all available appointments, requested from the backend as json data
-      dates: ["2016-05-03"], // all available dates, requested from the backend as a list
-      departments: ["AAA"], // all available departments, requested from the backend as a list
-      doctors: ["wow"], // all available doctors, requested from the backend as a list
+      dates: [], // all available dates, requested from the backend as a list
+      departments: [], // all available departments, requested from the backend as a list
+      doctors: [], // all available doctors, requested from the backend as a list
       datesFilter: [],
       departmentsFilter: [],
       doctorsFilter: [],
@@ -152,7 +113,7 @@ export default {
 
       // Create new medical_record
       axios
-        .post("/api/medical_record/", {
+        .post("..//api/medical_record/", {
           doctor: sessionStorage.getItem("id"),
           patient: row.patient_id,
           dateTime: submitTime,
@@ -162,9 +123,11 @@ export default {
           // router: go to RecordCreate
           // this.$router.push("/newRecord/" + row.patient_id + "/" + resp.medical_record_id);
           this.recordID = resp.data.record_id;
-          sessionStorage.setItem("recordID", this.recordID);
-          axios.delete("api/appointment/" + row.appointmentID + "/");
-          this.$router.push("/newRecord/" + row.patient_id + "/" + row.recordID);
+          // sessionStorage.setItem("recordID", this.recordID);
+          axios.delete("../api/appointment/" + row.appointmentID + "/");
+          this.$router.push(
+            "/newRecord/" +  this.recordID
+          );
         });
 
       // for testing only, will move to the "then" part and change "row.mri" to "resp.mri"

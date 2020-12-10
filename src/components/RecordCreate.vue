@@ -1,9 +1,7 @@
 <template>
   <div id="record">
-    <el-page-header @back="goBack" content="Create a New Medical Record">
-    </el-page-header>
 
-    <el-card class="header">
+    <!-- <el-card class="header">
       <table style="width: 100%">
         <tr>
           <th class="headerEntry">Name: {{ patientName }}</th>
@@ -14,11 +12,10 @@
           <th class="headerEntry">Doctor: {{ doctorName }}</th>
           <th class="headerEntry">Department: {{ dept }}</th>
           <th class="headerEntry">
-            <!-- Date: {{ Intl.DateTimeFormat("zh-CN").format(recordTime) }} ? -->
           </th>
         </tr>
       </table>
-    </el-card>
+    </el-card> -->
 
     <el-card class="box-card" id="recordBody">
       <div id="recordContent" v-if="current == 1">
@@ -74,11 +71,6 @@
   height: 100%;
 }
 
-.header {
-  margin: 10px;
-  margin-bottom: 0;
-}
-
 .headerEntry {
   text-align: left;
   width: 33.3%;
@@ -86,6 +78,7 @@
 
 #recordBody {
   margin: 10px;
+  margin-top: 0px;
   height: calc(100% - 60px - 52px - 70px);
   overflow: auto;
 }
@@ -126,7 +119,14 @@ export default {
   components: {
     pdf,
   },
+    props: {
+    interview: {
+      // type: Number,
+      default: -1,
+    },
+  },
   mounted() {
+    this.recordID = this.interview//sessionStorage.getItem("recordID");
     if (sessionStorage.getItem("role") != "doctor") {
       this.$message.error("Only doctor can create records!");
     }
@@ -181,7 +181,6 @@ export default {
       });
     },
     submitRecord(finalize) {
-      this.recordID = sessionStorage.getItem("recordID");
       axios
         .patch("../../api/medical_record/" + this.recordID + "/", {
           recordID: this.recordID,

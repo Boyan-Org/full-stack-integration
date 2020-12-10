@@ -71,7 +71,7 @@ import axios from "axios";
 export default {
   data() {
     return {
-      id: sessionStorage.getItem("id"),
+      id: 0,
       form: {
         name: "",
         gender: "",
@@ -83,7 +83,18 @@ export default {
       },
     };
   },
+  props: {
+    interview: {
+      // type: Number,
+      default: -1,
+    },
+  },
   mounted() {
+    if (this.interview != -1) {
+      this.id = this.interview;
+    } else {
+      this.id = sessionStorage.getItem("id");
+    }
     axios
       .get("../api/personal_information/" + this.id+"/")
       .then((resp) => {

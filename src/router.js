@@ -22,12 +22,14 @@ import Page404 from "./components/Page404.vue";
 import RecordFilter from "./components/RecordFilter.vue";
 
 import ListAppointment from "./components/ListAppointment.vue";
-import RecordCreate from "./components/RecordCreate.vue";
+// import RecordCreate from "./components/RecordCreate.vue";
+
+import Interview from "./components/Interview.vue";
 
 Vue.use(Router)
 
 export default new Router({
-  // mode: 'history',
+  mode: 'history',
   routes: [
     {
       path: '/login',
@@ -72,8 +74,8 @@ export default new Router({
       ]
     },
     {
-      path: '/newRecord/:patient_id/:medicalRecord_id', component: Dashboard, children: [ // create a new record for certain patient
-        { path: '', component: RecordCreate }
+      path: '/newRecord/:id', component: Dashboard, children: [ // create a new record for certain patient
+        { path: '', component: Interview }
       ]
     },
     {
@@ -100,6 +102,11 @@ export default new Router({
         { path: '', component: RecordUpload }
       ]
     },
+    // {
+    //   path:'/interview/:id', component: Dashboard, children: [
+    //     { path: '', component: Interview }
+    //   ]
+    // },
     {
       name: '404',
       path: '/404',
