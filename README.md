@@ -23,16 +23,56 @@ Frontend side
 
 ### Project Stricture
 
+- 📂 __django\-vue\-template__
+   - 📄 [README.md](README.md)
+   - 📄 [app.json](app.json)
+   - 📂 __backend__
+     - 📂 __api__
+       - 📄 [\_\_init\_\_.py](backend/api/__init__.py)
+       - 📄 [admin.py](backend/api/admin.py)
+       - 📄 [apps.py](backend/api/apps.py)
+       - 📄 [models.py](backend/api/models.py)
+       - 📄 [serializers.py](backend/api/serializers.py)
+       - 📄 [tests.py](backend/api/tests.py)
+       - 📄 [views.py](backend/api/views.py)
+     - 📂 __settings__
+       - 📄 [\_\_init\_\_.py](backend/settings/__init__.py)
+       - 📄 [dev.py](backend/settings/dev.py)
+       - 📄 [prod.py](backend/settings/prod.py)
+     - 📄 [urls.py](backend/urls.py)
+     - 📄 [wsgi.py](backend/wsgi.py)
+   - 📄 [database\_models.png](database_models.png)
+   - 📄 [db.sqlite3](db.sqlite3)
+   - 📄 [manage.py](manage.py)
+   - 📄 [package.json](package.json)
+   - 📄 [requirements.txt](requirements.txt)
+   - 📂 __src__
+     - 📄 [App.vue](src/App.vue)
+     - 📂 __assets__
+     - 📂 __components__
+       - 📄 [AccountInput.vue](src/components/AccountInput.vue)
+       - 📄 [DashInfo.vue](src/components/DashInfo.vue)
+       - 📄 [Dashboard.vue](src/components/Dashboard.vue)
+       - 📄 [InfoBoard.vue](src/components/InfoBoard.vue)
+       - 📄 [Interview.vue](src/components/Interview.vue)
+       - 📄 [ListAppointment.vue](src/components/ListAppointment.vue)
+       - 📄 [LoginForm.vue](src/components/LoginForm.vue)
+       - 📄 [MakeAppointment.vue](src/components/MakeAppointment.vue)
+       - 📄 [Med.vue](src/components/Med.vue)
+       - 📄 [Page404.vue](src/components/Page404.vue)
+       - 📄 [Person.vue](src/components/Person.vue)
+       - 📄 [RecordCreate.vue](src/components/RecordCreate.vue)
+       - 📄 [RecordEdit.vue](src/components/RecordEdit.vue)
+       - 📄 [RecordFilter.vue](src/components/RecordFilter.vue)
+       - 📄 [RecordUpload.vue](src/components/RecordUpload.vue)
+       - 📄 [RecordView.vue](src/components/RecordView.vue)
+       - 📄 [RegForm.vue](src/components/RegForm.vue)
+       - 📄 [Schedule.vue](src/components/Schedule.vue)
+     - 📄 [main.js](src/main.js)
+     - 📄 [router.js](src/router.js)
+   - 📄 [vue.config.js](vue.config.js)
 
-| Location             |  Content                                   |
-|----------------------|--------------------------------------------|
-| `/backend`           | Django Project & Backend Config            |
-| `/backend/api`       | Django App (`/api`)                        |
-| `/src`               | Vue App .                                  |
-| `/src/main.js`       | JS Application Entry Point                 |
-| `/public/index.html` | Html Application Entry Point (`/`)         |
-| `/public/static`     | Static Assets                              |
-| `/dist/`             | Bundled Assets Output (generated at `yarn build`) |
+
 
 ## Prerequisites
 
@@ -98,53 +138,3 @@ development server only on `:8000`, and you have to build the Vue app first and 
 $ yarn build
 $ python manage.py runserver
 ```
-
-## Deploy
-
-* Set `ALLOWED_HOSTS` on [`backend.settings.prod`](/backend/settings/prod.py)
-
-### Heroku Server
-
-```
-$ heroku apps:create django-vue-template-demo
-$ heroku git:remote --app django-vue-template-demo
-$ heroku buildpacks:add --index 1 heroku/nodejs
-$ heroku buildpacks:add --index 2 heroku/python
-$ heroku addons:create heroku-postgresql:hobby-dev
-$ heroku config:set DJANGO_SETTINGS_MODULE=backend.settings.prod
-$ heroku config:set DJANGO_SECRET_KEY='...(your django SECRET_KEY value)...'
-
-$ git push heroku
-```
-
-Heroku's nodejs buildpack will handle install for all the dependencies from the [`package.json`](/package.json) file.
-It will then trigger the `postinstall` command which calls `yarn build`.
-This will create the bundled `dist` folder which will be served by whitenoise.
-
-The python buildpack will detect the [`Pipfile`](/Pipfile) and install all the python dependencies.
-
-The [`Procfile`](/Procfile) will run Django migrations and then launch Django'S app using gunicorn, as recommended by heroku.
-
-##### Heroku One Click Deploy
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/gtalarico/django-vue-template)
-
-## Static Assets
-
-See `settings.dev` and [`vue.config.js`](/vue.config.js) for notes on static assets strategy.
-
-This template implements the approach suggested by Whitenoise Django.
-For more details see [WhiteNoise Documentation](http://whitenoise.evans.io/en/stable/django.html)
-
-It uses Django Whitenoise to serve all static files and Vue bundled files at `/static/`.
-While it might seem inefficient, the issue is immediately solved by adding a CDN
-with Cloudfront or similar.
-Use [`vue.config.js`](/vue.config.js) > `baseUrl` option to set point all your assets to the CDN,
-and then set your CDN's origin back to your domains `/static` url.
-
-Whitenoise will serve static files to your CDN once, but then those assets are cached
-and served directly by the CDN.
-
-This allows for an extremely simple setup without the need for a separate static server.
-
-[Cloudfront Setup Wiki](https://github.com/gtalarico/django-vue-template/wiki/Setup-CDN-on-Cloud-Front)
