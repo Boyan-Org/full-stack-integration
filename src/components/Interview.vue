@@ -1,4 +1,5 @@
 <template>
+  <!-- This is component for Interviewing Patient -->
   <div>
     <el-page-header
       @back="goBack"
@@ -9,7 +10,7 @@
     <el-row :gutter="20">
       <el-col :span="12">
         <el-card class="header">
-          <InfoBoard v-bind:interview="patient" v-if="patient!=-1"/>
+          <InfoBoard v-bind:interview="patient" v-if="patient != -1" />
         </el-card>
       </el-col>
       <el-col :span="12">
@@ -36,19 +37,19 @@ export default {
     InfoBoard,
   },
   created() {
+    // Request medical record data for this interview
     axios
       .get("../../api/medical_record/" + this.record, {
         recordID: this.record,
       })
       .then((resp) => {
-        // "patient_id": 1,
         var rData = resp.data;
         this.patient = rData.patient_id;
       })
       .catch((error) => {
-        //error handling
         console.log(error);
         var loginCode = error.response.status;
+        // If medical record does not exist
         if (loginCode == 404) {
           this.$message.error("Record does not exist!");
         }

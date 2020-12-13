@@ -31,7 +31,6 @@ export default {
   },
   computed:{
     attrs: function(){
-      console.log(this.dates);
       return [
         {
           key: 'today',
@@ -42,12 +41,12 @@ export default {
     }
   },
   mounted() {
+    // Get department information of doctor
     axios
       .get(
         "../api/department_information/" + sessionStorage.getItem("id") + "/"
       )
       .then((resp) => {
-        // console.log(JSON.parse(resp.data.workingHour));
         this.department = resp.data.department;
         this.supervisor = resp.data.supervisor;
         this.work = JSON.parse(resp.data.workingHour);

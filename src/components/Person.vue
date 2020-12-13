@@ -1,4 +1,5 @@
 <template>
+<!-- This is component for displaying personal_information -->
   <el-form
     :model="form"
     status-icon
@@ -7,9 +8,11 @@
     label-width="100px"
   >
     <el-form-item label="Name" required="">
+      <!-- Display my name -->
       <el-input v-model="form.name"></el-input>
     </el-form-item>
     <el-form-item label="Gender" required="">
+      <!-- Display my gender -->
       <el-select v-model="form.gender" :placeholder="form.gender">
         <el-option label="Male" value="Male"></el-option>
         <el-option label="Female" value="Female"></el-option>
@@ -18,6 +21,7 @@
 
     <el-row>
       <el-col :span="11">
+        <!-- Display my birthday -->
         <el-form-item label="Date of Birth" required="">
           <el-date-picker
             type="date"
@@ -28,6 +32,7 @@
         </el-form-item>
       </el-col>
       <el-col :span="11">
+        <!-- Display my age -->
         <el-form-item label="Age">
           <el-tooltip
             class="item"
@@ -40,18 +45,20 @@
         </el-form-item>
       </el-col>
     </el-row>
-
     <el-form-item label="Email" required="">
+      <!-- Display my email -->
       <el-input v-model="form.email"></el-input>
     </el-form-item>
     <el-form-item label="Phone">
+      <!-- Display my phone number -->
       <el-input v-model="form.phone"></el-input>
     </el-form-item>
     <el-form-item label="Address">
+      <!-- Display my address -->
       <el-input v-model="form.addr"></el-input>
     </el-form-item>
-
     <el-form-item label="Marital status">
+      <!-- Display my marital status -->
       <el-select v-model="form.marital" placeholder="">
         <el-option label="Single" value="Single"></el-option>
         <el-option label="Married" value="Married"></el-option>
@@ -85,7 +92,6 @@ export default {
   },
   props: {
     interview: {
-      // type: Number,
       default: -1,
     },
   },
@@ -95,18 +101,10 @@ export default {
     } else {
       this.id = sessionStorage.getItem("id");
     }
+    // Fetch my personal information
     axios
-      .get("../api/personal_information/" + this.id+"/")
+      .get("../api/personal_information/" + this.id + "/")
       .then((resp) => {
-        // console.log(resp.data);
-        // address: "";
-        // dateOfBirth: "";
-        // email: "";
-        // gender: "";
-        // id: 3;
-        // maritalStatus: "";
-        // name: "Patient";
-        // phoneNumber: "";
         var data = resp.data;
         var form = this.form;
         form.name = data.name;
@@ -127,8 +125,8 @@ export default {
       });
   },
   computed: {
-    age: function () {
-      // birthday is a date
+    age: function() {
+      // Compute my age
       var birthday = this.form.dob;
       var ageDifMs = Date.now() - birthday;
       var ageDate = new Date(ageDifMs); // miliseconds from epoch
@@ -137,21 +135,22 @@ export default {
   },
   methods: {
     submitForm() {
+      // Update personal_information handler
       var dob = new Date(this.form.dob);
       var year = dob.getFullYear();
       var month = dob.getMonth() + 1;
       var day = dob.getDate();
       var params = {
-        id: this.id,
-        address: this.form.addr,
-        dateOfBirth: year + "-" + month + "-" + day,
-        email: this.form.email,
-        gender: this.form.gender,
+        id           : this.id,
+        address      : this.form.addr,
+        dateOfBirth  : year + "-" + month + "-" + day,
+        email        : this.form.email,
+        gender       : this.form.gender,
         maritalStatus: this.form.marital,
-        name: this.form.name,
-        phoneNumber: this.form.phone,
+        name         : this.form.name,
+        phoneNumber  : this.form.phone,
       };
-      console.log(year + "-" + month + "-" + day);
+      // Patch personal_information with inputted info
       axios
         .patch("../api/personal_information/" + this.id + "/", params)
         .then((resp) => {

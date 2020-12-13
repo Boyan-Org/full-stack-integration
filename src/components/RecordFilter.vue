@@ -1,4 +1,5 @@
 <template>
+  <!-- This is the component for filtering the medical record -->
   <div>
     <el-form
       :inline="false"
@@ -77,21 +78,12 @@
     >
       <el-table-column prop="doctor_name" label="Doctor" sortable>
       </el-table-column>
-      <el-table-column
-        prop="department"
-        label="Department"
-        sortable
-      >
+      <el-table-column prop="department" label="Department" sortable>
       </el-table-column>
       <el-table-column prop="patient_name" label="Patient" sortable>
       </el-table-column>
       <el-table-column prop="dateTime" label="Time" sortable>
         <template slot-scope="scope">
-          <!-- <span style="margin-left: 10px">{{
-            Intl.DateTimeFormat("zh-CN", timeOption).format(
-              Date.parse(scope.row.dateTime)
-            )
-          }}</span> -->
           <span style="margin-left: 10px">{{
             Intl.DateTimeFormat("zh-CN", timeOption).format(scope.row.dateTime)
           }}</span>
@@ -142,16 +134,19 @@ export default {
     };
   },
   created() {
+    // If user has already logged in, load user data from sessionStorage
     if (sessionStorage.getItem("id") != null) {
       this.user.id = sessionStorage.getItem("id");
       this.user.name = sessionStorage.getItem("name");
       this.user.role = sessionStorage.getItem("role");
     }
+    // If user type is patient
     if (this.user.role == "patient") {
       this.form.patientId = this.user.id;
       this.form.patient = this.user.name;
       this.patientInput = true;
     }
+    // If user type is doctor
     if (this.user.role == "doctor") {
       this.form.doctorId = this.user.id;
       this.form.doctor = this.user.name;
@@ -161,6 +156,7 @@ export default {
   },
   mounted() {},
   methods: {
+    // Submit handler
     onSubmit() {
       if (this.value) {
         this.form.from = this.value[0];
@@ -169,9 +165,9 @@ export default {
         this.form.from = undefined;
         this.form.to = undefined;
       }
-      // console.log(this.form);
       this.filterEntry();
     },
+    // Query doctor
     queryDoc(queryString, cb) {
       var list = this.doctors;
       var results = queryString
@@ -179,6 +175,7 @@ export default {
         : list;
       cb(results);
     },
+    // Query patient
     queryPat(queryString, cb) {
       var list = this.patients;
       var results = queryString
@@ -186,6 +183,7 @@ export default {
         : list;
       cb(results);
     },
+    // Query department
     queryDept(queryString, cb) {
       var list = this.depts;
       var results = queryString
@@ -200,10 +198,11 @@ export default {
         );
       };
     },
+    // Enter record editing page
     enterRecord(item) {
-      // console.log(item.recordID);
       router.push("record/" + item.recordID);
     },
+    // Get filtered medical record
     requestEntry() {
       var params = {};
       if (this.form.doctorId != "") {
@@ -212,29 +211,23 @@ export default {
       if (this.form.patientId != "") {
         params.patient_id = this.form.patientId;
       }
+      // Filter medical record by posting filter data
       axios
         .post("api/medical_record/filter_record/", params)
         .then((resp) => {
-          console.log(resp);
           this.totalRecord = resp.data.record_num;
-          // this.recordEntry = resp.data.record_data;
-          // this.allEntry = resp.data.record_data;
           for (let i = 0; i < this.totalRecord; i++) {
             const element = resp.data.record_data[i];
             this.recordEntry.push({
               doctor_name: element.doctor_name,
-              // doctor_id: element.doctor_id,
               patient_name: element.patient_name,
-              // patients_id: element.patients_id,
               recordID: element.recordID,
               department: element.department,
               dateTime: Date.parse(element.dateTime),
             });
             this.allEntry.push({
               doctor_name: element.doctor_name,
-              // doctor_id: element.doctor_id,
               patient_name: element.patient_name,
-              // patients_id: element.patients_id,
               recordID: element.recordID,
               department: element.department,
               dateTime: Date.parse(element.dateTime),
@@ -243,12 +236,10 @@ export default {
               this.doctors_id.push(element.doctor_name);
               this.doctors.push({ value: element.doctor_name });
             }
-
             if (this.patients_id.indexOf(element.patient_name) == -1) {
               this.patients_id.push(element.patient_name);
               this.patients.push({ value: element.patient_name });
             }
-
             if (this.allDepts.indexOf(element.department) == -1) {
               this.allDepts.push(element.department);
               this.depts.push({ value: element.department });
@@ -256,9 +247,7 @@ export default {
           }
         })
         .catch((error) => {
-          //error handling
           console.log(error.response.status);
-          // var loginCode = error.response.status;
         });
     },
     filterEntry() {
@@ -291,5 +280,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

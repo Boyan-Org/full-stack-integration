@@ -1,19 +1,24 @@
 <template>
+  <!-- This is the component for displaying personal information -->
   <el-tabs v-model="activeName" @tab-click="handleClick">
     <el-tab-pane label="Personal Info" name="first">
       <transition name="el-fade-in"
-        ><Person v-show="activeName == 'first'" v-bind:interview="interview" /></transition
+        ><Person
+          v-show="activeName == 'first'"
+          v-bind:interview="interview"/></transition
     ></el-tab-pane>
     <el-tab-pane
-      v-if="user.role == 'patient' "
+      v-if="user.role == 'patient'"
       label="Medical Info"
       name="second"
       ><transition name="el-fade-in"
-        ><Med v-show="activeName == 'second'" v-bind:interview="interview" /></transition
+        ><Med
+          v-show="activeName == 'second'"
+          v-bind:interview="interview"/></transition
     ></el-tab-pane>
     <el-tab-pane v-else label="Schedule" name="third"
       ><transition name="el-fade-in"
-        ><Schedule v-show="activeName == 'third'" /></transition
+        ><Schedule v-show="activeName == 'third'"/></transition
     ></el-tab-pane>
   </el-tabs>
 </template>
@@ -38,8 +43,6 @@ export default {
   methods: {
     handleClick(tab) {
       return tab;
-      // console.log(tab);
-      // console.log(event);
     },
   },
   props: {
@@ -48,14 +51,13 @@ export default {
       default: -1,
     },
   },
-  created: function () {
-    console.log(this.interview);
+  created: function() {
     if (this.interview == -1) {
+      // If user has logged in, load user info from sessionStorage
       if (sessionStorage.getItem("id") != null) {
         this.user.id = sessionStorage.getItem("id");
         this.user.name = sessionStorage.getItem("name");
         this.user.role = sessionStorage.getItem("role");
-        console.log(this.user);
       }
     } else {
       this.user.id = this.interview;

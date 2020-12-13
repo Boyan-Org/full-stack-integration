@@ -1,4 +1,5 @@
 <template>
+<!-- This is component for login input window -->
   <div
     id="login-container"
     :style="{
@@ -16,18 +17,20 @@ import router from "../router";
 export default {
   data() {
     return {
+      // Component size
       windowWidth: window.innerWidth,
       windowHeight: window.innerHeight,
     };
   },
-  created: function () {
+  created: function() {
+    // If user has already logged in, redirect to dashboard
     if (sessionStorage.getItem("id") != null) {
       router.push("/dashboard");
     }
   },
   mounted() {
+    // Auto resize the component as window resized
     window.onresize = () => {
-      console.log("window resize");
       return (() => {
         this.windowWidth = window.innerWidth;
         this.windowHeight = window.innerHeight;
@@ -35,7 +38,8 @@ export default {
     };
   },
   computed: {
-    loginContainerPadding: function () {
+    // Decide the window padding
+    loginContainerPadding: function() {
       if (this.windowWidth < 768) {
         return "0 5vw 0 5vw";
       } else if (this.windowWidth > 1200) {
@@ -44,16 +48,16 @@ export default {
         return "0 10vw 0 0";
       }
     },
-    flexCenter: function () {
-      // console.log(window.innerWidth);
+    // Decide the flexCenter type
+    flexCenter: function() {
       if (this.windowWidth < 768) {
         return "center";
       } else {
         return "right";
       }
     },
-    height: function () {
-      // console.log(this.windowHeight);
+    // Decide the window hright
+    height: function() {
       return this.windowHeight + "px";
     },
   },
@@ -69,8 +73,7 @@ export default {
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
-  background-image: 
-  linear-gradient(
+  background-image: linear-gradient(
       225deg,
       rgb(4, 0, 87) 0%,
       rgba(48, 7, 105, 0.603) 30%,

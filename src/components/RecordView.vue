@@ -1,9 +1,11 @@
 <template>
+<!-- This is the component for viewing the medical_record -->
   <div id="record">
     <el-page-header @back="goBack" content="View Medical Record">
     </el-page-header>
 
     <el-card class="header">
+    <!-- Display record header -->
       <el-row>
         <el-col :span="23">
           <table style="width: 100%">
@@ -31,6 +33,7 @@
     </el-card>
 
     <el-card class="box-card" id="recordBody">
+    <!-- Display record body content -->
       <div id="recordContent" v-if="current == 1">
         <dl>
           <dt><h3>Symptoms</h3></dt>
@@ -48,10 +51,10 @@
         </dl>
       </div>
       <pdf v-else :src="pdfSrc"></pdf>
-      <!-- <iframe :src="pdfSrc" width="100%" height="900px"></iframe> -->
     </el-card>
 
     <div class="paging">
+      <!-- Display paging navigation -->
       <el-pagination
         background
         :hide-on-single-page="true"
@@ -135,8 +138,8 @@ export default {
     pdf,
   },
   computed: {
+    // Get patient age
     patientAge: function () {
-      // birthday is a date
       var birthday = this.patientDOB;
       var ageDifMs = this.recordTime - birthday;
       var ageDate = new Date(ageDifMs); // miliseconds from epoch
@@ -145,28 +148,13 @@ export default {
   },
   mounted() {
     this.recordID = this.$route.params.id;
+    // Fetch medical record data
     axios
       .get("../api/medical_record/" + this.recordID, {
         recordID: this.recordID,
       })
       .then((resp) => {
-        // "attachmentNb": 0,
-        // "dateTime": "2020-11-29T00:17:34",
-        // "department": "dept1",
-        // "diagnosis": "d",
-        // "doctor_id": 2,
-        // "doctor_name": "Boyan Xu",
-        // "flag": false,
-        // "patient_birthday": "",
-        // "patient_gender": "",
-        // "patient_id": 1,
-        // "patient_name": "Frank Zhou",
-        // "recordID": 1,
-        // "symptoms": "s",
-        // "treatments": "t"
-        console.log(resp);
         var rData = resp.data;
-        console.log(rData);
         this.patientName = rData.patient_name;
         this.doctorName = rData.doctor_name;
         this.sym = rData.symptoms;
@@ -177,7 +165,6 @@ export default {
         this.patientGender = rData.patient_gender;
         this.recordTime = Date.parse(rData.dateTime);
         this.totalPage = rData.attachmentNb + 1;
-        // this.finalized = rData.flag;
         this.finalized = (rData.flag || sessionStorage.getItem("role") != "doctor");
       })
       .catch((error) => {

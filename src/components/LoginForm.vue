@@ -1,4 +1,5 @@
 <template>
+  <!-- This is the component for login form -->
   <el-card shadow="hover" class="mx-auto">
     <div id="loginform">
       <el-form ref="form" :model="form" label-width="80px">
@@ -6,9 +7,11 @@
           <el-alert :title="loginError" type="error"> </el-alert>
           <br />
         </div>
+        <!-- Input username -->
         <el-form-item label="Username" required="" :error="nameError">
           <el-input v-model="form.username"></el-input>
         </el-form-item>
+        <!-- Input password -->
         <el-form-item label="Password" required="" :error="pwdError">
           <el-input
             placeholder="Password"
@@ -16,7 +19,9 @@
             show-password
           ></el-input>
         </el-form-item>
+        <!-- Submit button -->
         <el-button type="primary" @click="onSubmit">Login</el-button>
+        <!-- Register button -->
         <div>
           <br />New User?
           <el-link type="primary" @click="open">Create new account</el-link>
@@ -54,21 +59,21 @@ export default {
       show: true,
     };
   },
-  // computed: mapState({
-  //   messages: (state) => state.messages.messages,
-  // }),
+
   methods: {
+    //  Submit handler
     onSubmit(evt) {
       if (this.loginError) {
         this.loginError = "";
       }
-      //submit login form
+      // username is empty
       if (this.form.username == "") {
         this.nameError = "Please input your username";
         return;
       } else {
         this.nameError = "";
       }
+      // password is empty
       if (this.form.password == "") {
         this.pwdError = "Please input your password";
         return;
@@ -84,9 +89,7 @@ export default {
           password: this.form.password,
         })
         .then((resp) => {
-          // TODO: remove response content
           var userData = resp.data;
-          console.log(userData);
           // if no problem, save it in the cookie and jump to Dashboard
           if (userData.username === this.form.username) {
             var storage = sessionStorage;
@@ -120,7 +123,6 @@ export default {
             });
           }
         });
-
     },
 
     open() {

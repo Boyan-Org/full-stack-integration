@@ -1,8 +1,9 @@
 <template>
+  <!-- This is the component for making appointment -->
   <div>
     <el-button @click="clearFilter">reset all filters</el-button>
     <el-table ref="filterTable" :data="available_slots" style="width: 100%">
-      <!-- date column  -->
+      <!-- date columns  -->
       <el-table-column
         prop="date"
         label="Date"
@@ -78,35 +79,36 @@ export default {
     };
   },
   mounted() {
+    // Request a list of available slots
     axios
       .post("api/appointment/get_available_slots/", {
-        patient_id: sessionStorage.getItem("id")
+        patient_id: sessionStorage.getItem("id"),
       })
       .then((resp) => {
         this.available_slots = resp.data.slots;
-
-        for (let i=0; i<resp.data.dates.length; i++) {
+        // Update filters
+        for (let i = 0; i < resp.data.dates.length; i++) {
           var date = resp.data.dates[i];
           this.datesFilter.push({
             text: date,
             value: date,
           });
         }
-        for (let i=0; i<resp.data.dept_names.length; i++) {
+        for (let i = 0; i < resp.data.dept_names.length; i++) {
           var dept_name = resp.data.dept_names[i];
           this.departmentsFilter.push({
             text: dept_name,
             value: dept_name,
           });
         }
-        for (let i=0; i<resp.data.doctor_names.length; i++) {
+        for (let i = 0; i < resp.data.doctor_names.length; i++) {
           var doctor_name = resp.data.doctor_names[i];
           this.doctorsFilter.push({
             text: doctor_name,
             value: doctor_name,
           });
         }
-        for (let i=0; i<resp.data.times.length; i++) {
+        for (let i = 0; i < resp.data.times.length; i++) {
           var time = resp.data.times[i];
           this.timeFilter.push({
             text: time,
@@ -117,96 +119,104 @@ export default {
   },
 
   methods: {
+    // Clear filters
     clearFilter() {
       this.$refs.filterTable.clearFilter();
     },
-    //   formatter(row, column) {  if column is not used, then there will be err
+    //  If column is not used, then there will be err
     formatter(row) {
       return row.address;
     },
-
-    updatePage(){
+    // Display available_slots
+    updatePage() {
       axios
-      .post("api/appointment/get_available_slots/", {
-        patient_id: sessionStorage.getItem("id")
-      })
-      .then((resp) => {
-        this.available_slots = resp.data.slots;
+        .post("api/appointment/get_available_slots/", {
+          patient_id: sessionStorage.getItem("id"),
+        })
+        .then((resp) => {
+          this.available_slots = resp.data.slots;
 
-        for (let i=0; i<resp.data.dates.length; i++) {
-          var date = resp.data.dates[i];
-          this.datesFilter.push({
-            text: date,
-            value: date,
-          });
-        }
-        for (let i=0; i<resp.data.dept_names.length; i++) {
-          var dept_name = resp.data.dept_names[i];
-          this.departmentsFilter.push({
-            text: dept_name,
-            value: dept_name,
-          });
-        }
-        for (let i=0; i<resp.data.doctor_names.length; i++) {
-          var doctor_name = resp.data.doctor_names[i];
-          this.doctorsFilter.push({
-            text: doctor_name,
-            value: doctor_name,
-          });
-        }
-        for (let i=0; i<resp.data.times.length; i++) {
-          var time = resp.data.times[i];
-          this.timeFilter.push({
-            text: time,
-            value: time,
-          });
-        }
-      });
+          // Update filters
+          for (let i = 0; i < resp.data.dates.length; i++) {
+            var date = resp.data.dates[i];
+            this.datesFilter.push({
+              text: date,
+              value: date,
+            });
+          }
+          for (let i = 0; i < resp.data.dept_names.length; i++) {
+            var dept_name = resp.data.dept_names[i];
+            this.departmentsFilter.push({
+              text: dept_name,
+              value: dept_name,
+            });
+          }
+          for (let i = 0; i < resp.data.doctor_names.length; i++) {
+            var doctor_name = resp.data.doctor_names[i];
+            this.doctorsFilter.push({
+              text: doctor_name,
+              value: doctor_name,
+            });
+          }
+          for (let i = 0; i < resp.data.times.length; i++) {
+            var time = resp.data.times[i];
+            this.timeFilter.push({
+              text: time,
+              value: time,
+            });
+          }
+        });
     },
 
+    // Filte by tag
     filterTag(value, row) {
       return row.tag === value;
     },
+    // Filte by column text
     filterHandler(value, row, column) {
       const property = column["property"];
       return row[property] === value;
     },
 
-    // make an appointment
+    // Handle making appointment
     handleBook(index, row) {
-
       let doctor_id = row.doctor_id;
       let patient_id = sessionStorage.getItem("id");
       let date = row.date;
       let time = row.time;
 
-      function setDateZero(date){
-          return date < 10 ? '0' + date : date;
-        }
+      function setDateZero(date) {
+        return date < 10 ? "0" + date : date;
+      }
 
+      // Get submitTime
       let now = new Date(Date.now());
       var year = now.getFullYear();
       var month = setDateZero(now.getMonth() + 1);
       var day = setDateZero(now.getDate());
-      var timeString = now.toLocaleTimeString([],{hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'})
-
+      var timeString = now.toLocaleTimeString([], {
+        hour12: false,
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
       let submitTime = year + "-" + month + "-" + day + "T" + timeString;
-      console.log(row.doctor_id);
+      // Request backend to reserve an appointment
       axios
         .post("api/appointment/", {
           doctor: doctor_id,
           patient: patient_id,
           date: date,
-          time:time,
+          time: time,
           submitTime: submitTime,
         })
-        .then(()=>{
+        .then(() => {
           this.$message({
-            message: 'Congrats! Appointment Booked!',
-            type: 'success'
-            });
+            message: "Congrats! Appointment Booked!",
+            type: "success",
+          });
           this.updatePage();
-        })
+        });
     },
   },
 };

@@ -1,38 +1,25 @@
 <template>
+  <!-- This is the component for creating medical record -->
   <div id="record">
-
-    <!-- <el-card class="header">
-      <table style="width: 100%">
-        <tr>
-          <th class="headerEntry">Name: {{ patientName }}</th>
-          <th class="headerEntry">Age: {{ patientAge }}</th>
-          <th class="headerEntry">Gender: {{ patientGender }}</th>
-        </tr>
-        <tr>
-          <th class="headerEntry">Doctor: {{ doctorName }}</th>
-          <th class="headerEntry">Department: {{ dept }}</th>
-          <th class="headerEntry">
-          </th>
-        </tr>
-      </table>
-    </el-card> -->
-
     <el-card class="box-card" id="recordBody">
       <div id="recordContent" v-if="current == 1">
         <el-form ref="form" :model="form">
           <dl>
             <dt><h3>Symptoms</h3></dt>
             <dd>
+              <!-- Input Symptoms -->
               <el-input type="textarea" :rows="2" v-model="form.sym" autosize>
               </el-input>
             </dd>
             <dt><h3>Diagnosis</h3></dt>
             <dd>
+              <!-- Input diagnostics -->
               <el-input type="textarea" :rows="2" v-model="form.diag" autosize>
               </el-input>
             </dd>
             <dt><h3>Treatment</h3></dt>
             <dd>
+              <!-- Input treatments -->
               <el-input type="textarea" :rows="2" v-model="form.treat" autosize>
               </el-input>
             </dd>
@@ -40,6 +27,7 @@
           <el-button type="primary" @click="onSubmit" :disabled="finalized"
             >Save</el-button
           >
+          <!-- Finalize the document -->
           <el-button
             type="primary"
             plain
@@ -119,18 +107,19 @@ export default {
   components: {
     pdf,
   },
-    props: {
+  props: {
     interview: {
       // type: Number,
       default: -1,
     },
   },
   mounted() {
-    this.recordID = this.interview//sessionStorage.getItem("recordID");
+    this.recordID = this.interview;
+    // Validate user identity
     if (sessionStorage.getItem("role") != "doctor") {
       this.$message.error("Only doctor can create records!");
     }
-
+    // Check if record is already finalized
     if (this.finalized) {
       this.$message.error(
         "This record has been finalized and cannot be modified!"
@@ -138,8 +127,8 @@ export default {
     }
   },
   computed: {
+    // Get patient age
     patientAge: function() {
-      // birthday is a date
       var birthday = this.patientDOB;
       var ageDifMs = this.recordTime - birthday;
       var ageDate = new Date(ageDifMs); // miliseconds from epoch
@@ -156,6 +145,7 @@ export default {
     onSubmit() {
       this.submitRecord(false);
     },
+    // Record Finalize Handler
     Finalize() {
       this.$confirm(
         "You will not be able to mofity this record once your finalize it. Proceed?",
@@ -166,21 +156,22 @@ export default {
           type: "warning",
         }
       )
-      .then(() => {
-        this.submitRecord(true);
-        this.$message({
-          type: "success",
-          message: "Success!",
+        .then(() => {
+          this.submitRecord(true);
+          this.$message({
+            type: "success",
+            message: "Success!",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Action cancelled!",
+          });
         });
-      })
-      .catch(() => {
-        this.$message({
-          type: "info",
-          message: "Action cancelled!",
-        });
-      });
     },
     submitRecord(finalize) {
+      // Patch the medical_record with modified inputs
       axios
         .patch("../../api/medical_record/" + this.recordID + "/", {
           recordID: this.recordID,

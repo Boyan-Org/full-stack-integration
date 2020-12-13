@@ -1,6 +1,6 @@
 <template>
+  <!-- This is component for dashboard Info -->
   <div>
-    <!-- {{ user }} -->
     <el-card class="box-card">
       <h1>{{ getGreeting() }}</h1>
       <h4>
@@ -10,9 +10,7 @@
   </div>
 </template>
 
-
 <script>
-// import router from '../router';
 export default {
   data() {
     return {
@@ -22,27 +20,26 @@ export default {
         year: "numeric",
         month: "numeric",
         day: "numeric",
-        // hour: "numeric",
-        // minute: "numeric",
-        // second: "numeric",
         hour12: false,
       },
     };
   },
-  created: function () {
+  created: function() {
+    // If user has already logged in, save user data to sessionStorage
     if (sessionStorage.getItem("id") != null) {
       this.user.id = sessionStorage.getItem("id");
       this.user.name = sessionStorage.getItem("name");
       this.user.role = sessionStorage.getItem("role");
-      // console.log(this.user);
     }
   },
   methods: {
+    // Decide greeting type based on current time
     getGreeting() {
+      var message = "";
       var user_name = this.user.name;
       var currentHour = new Date();
+
       currentHour = currentHour.getHours();
-      var message = "";
       if (6 <= currentHour && currentHour < 11) {
         message = "Good morning " + user_name + ", wish you a lovely day!";
       } else if (11 <= currentHour && currentHour < 13) {

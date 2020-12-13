@@ -1,9 +1,11 @@
 <template>
+  <!-- This is component for uploading medical record -->
   <div id="record">
     <el-page-header @back="goBack" content="Upload attachment">
     </el-page-header>
 
     <el-card class="header">
+      <!-- Display record header -->
       <table style="width: 100%">
         <tr>
           <th class="headerEntry">Name: {{ patientName }}</th>
@@ -21,6 +23,7 @@
     </el-card>
 
     <el-card class="box-card" id="recordBody">
+      <!-- Display record body -->
       <div id="recordContent" v-if="current == 1">
         <dl>
           <dt><h3>Symptoms</h3></dt>
@@ -36,12 +39,12 @@
             {{ treat }}
           </dd>
         </dl>
-
       </div>
       <pdf v-else :src="pdfSrc"></pdf>
     </el-card>
 
     <div class="paging">
+      <!-- page naviagtor -->
       <el-pagination
         background
         :hide-on-single-page="true"
@@ -83,7 +86,6 @@
 }
 </style>
 
-
 <script>
 import pdf from "vue-pdf";
 export default {
@@ -108,8 +110,8 @@ export default {
     pdf,
   },
   computed: {
-    patientAge: function () {
-      // birthday is a date
+    // Get patient age
+    patientAge: function() {
       var birthday = this.patientDOB;
       var ageDifMs = this.recordTime - birthday;
       var ageDate = new Date(ageDifMs); // miliseconds from epoch
@@ -118,7 +120,6 @@ export default {
   },
   methods: {
     goBack() {
-      console.log("go back");
     },
     pageChange(page) {
       this.current = page;

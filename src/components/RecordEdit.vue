@@ -1,9 +1,11 @@
 <template>
+<!-- This is the component for editing medical records  -->
   <div id="record">
     <el-page-header @back="goBack" content="Edit Medical Record">
     </el-page-header>
 
     <el-card class="header">
+      <!-- Display basic record information-->
       <table style="width: 100%">
         <tr>
           <th class="headerEntry">Name: {{ patientName }}</th>
@@ -21,28 +23,34 @@
     </el-card>
 
     <el-card class="box-card" id="recordBody">
+      <!-- Display record body -->
       <div id="recordContent" v-if="current == 1">
         <el-form ref="form" :model="form">
           <dl>
+            <!-- Display symptoms -->
             <dt><h3>Symptoms</h3></dt>
             <dd>
               <el-input type="textarea" :rows="2" v-model="form.sym" autosize>
               </el-input>
             </dd>
+            <!-- Display diagnosis -->
             <dt><h3>Diagnosis</h3></dt>
             <dd>
               <el-input type="textarea" :rows="2" v-model="form.diag" autosize>
               </el-input>
             </dd>
+            <!-- Display treatment -->
             <dt><h3>Treatment</h3></dt>
             <dd>
               <el-input type="textarea" :rows="2" v-model="form.treat" autosize>
               </el-input>
             </dd>
           </dl>
+          <!-- Save edit -->
           <el-button type="primary" @click="onSubmit" :disabled="finalized"
             >Save</el-button
           >
+          <!-- Finalize record -->
           <el-button
             type="primary"
             plain
@@ -97,7 +105,6 @@
 }
 </style>
 
-
 <script>
 import pdf from "vue-pdf";
 import router from "../router";
@@ -128,32 +135,19 @@ export default {
     pdf,
   },
   mounted() {
+    // Validate user identity
     if (sessionStorage.getItem("role") != "doctor") {
-          this.$message.error("Only doctor can modify records!");
+      this.$message.error("Only doctor can modify records!");
     }
+    // Get recordID
     this.recordID = this.$route.params.id;
+    // Fetch medical_record data
     axios
       .get("../../api/medical_record/" + this.recordID, {
         recordID: this.recordID,
       })
       .then((resp) => {
-        // "attachmentNb": 0,
-        // "dateTime": "2020-11-29T00:17:34",
-        // "department": "dept1",
-        // "diagnosis": "d",
-        // "doctor_id": 2,
-        // "doctor_name": "Boyan Xu",
-        // "flag": false,
-        // "patient_birthday": "",
-        // "patient_gender": "",
-        // "patient_id": 1,
-        // "patient_name": "Frank Zhou",
-        // "recordID": 1,
-        // "symptoms": "s",
-        // "treatments": "t"
-        console.log(resp);
         var rData = resp.data;
-        console.log(rData);
         this.patientName = rData.patient_name;
         this.doctorName = rData.doctor_name;
         this.form.sym = rData.symptoms;
@@ -164,7 +158,8 @@ export default {
         this.patientGender = rData.patient_gender;
         this.recordTime = Date.parse(rData.dateTime);
         this.totalPage = rData.attachmentNb + 1;
-        this.finalized = (rData.flag || sessionStorage.getItem("role") != "doctor");
+        this.finalized =
+          rData.flag || sessionStorage.getItem("role") != "doctor";
       })
       .catch((error) => {
         //error handling
@@ -174,7 +169,7 @@ export default {
           this.$message.error("Record does not exist!");
         }
       });
-
+    // Validate if the record is finalized
     if (this.finalized) {
       this.$message.error(
         "This record has been finalized and cannot be modified!"
@@ -182,8 +177,8 @@ export default {
     }
   },
   computed: {
-    patientAge: function () {
-      // birthday is a date
+    // Get patient age
+    patientAge: function() {
       var birthday = this.patientDOB;
       var ageDifMs = this.recordTime - birthday;
       var ageDate = new Date(ageDifMs); // miliseconds from epoch
@@ -200,6 +195,7 @@ export default {
     onSubmit() {
       this.submitRecord(false);
     },
+    // Finalize handler
     Finalize() {
       this.$confirm(
         "You will not be able to mofity this record once your finalize it. Proceed?",
@@ -224,6 +220,7 @@ export default {
           });
         });
     },
+    // Submission handler
     submitRecord(finalize) {
       var params = {
         recordID: this.recordID,
@@ -232,10 +229,11 @@ export default {
         symptoms: this.form.sym,
         flag: finalize,
       };
+      // Patch the medical record with the inputs
       axios
         .patch("../../api/medical_record/" + this.recordID + "/", params)
         .then(() => {
-          router.push("/record/"+this.recordID);
+          router.push("/record/" + this.recordID);
         })
         .catch((error) => {
           //error handling

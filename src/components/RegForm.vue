@@ -1,12 +1,21 @@
 <template>
+  <!-- This component is for registration -->
   <el-card shadow="hover" class="mx-auto">
     <div id="loginform">
       <el-form ref="form" :model="form" label-width="140px">
+        <!-- Input username -->
         <el-form-item label="Username" required="" :error="userError">
           <el-input v-model="form.username"></el-input>
         </el-form-item>
+        <!-- Input password -->
         <el-form-item label="Password" :error="ruleError" required="">
-          <el-popover ref="popover" placement="top" width="310" trigger="focus" title="The password must">
+          <el-popover
+            ref="popover"
+            placement="top"
+            width="310"
+            trigger="focus"
+            title="The password must"
+          >
             <dl>
               • Contain all of the 4 following character classes:
               <dd>o Lower case characters</dd>
@@ -23,6 +32,7 @@
             v-popover:popover
           ></el-input>
         </el-form-item>
+        <!-- Re-enter password -->
         <el-form-item :error="confirmError" required="">
           <span slot="label">Confirm Password</span>
           <el-input
@@ -31,6 +41,7 @@
             show-password
           ></el-input>
         </el-form-item>
+        <!-- Input Real Name -->
         <el-form-item label="Your Name" required="" :error="nameError">
           <el-input v-model="form.name" placeholder="John Smith"></el-input>
         </el-form-item>
@@ -71,7 +82,7 @@ export default {
   },
   methods: {
     open() {
-      //redirect to /login
+      //redirect to loginPage
       this.$router.push("/login");
     },
     onSubmit(evt) {
@@ -82,7 +93,6 @@ export default {
         this.userError = "";
       }
       if (this.form.password == "") {
-        //TODO: add complexity check
         // Test if the password is valid
         this.ruleError = "Please input a password";
         return;

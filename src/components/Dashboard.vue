@@ -1,5 +1,7 @@
 <template>
+  <!-- This is component for user dashboard -->
   <el-container>
+    <!-- Dashboard menu -->
     <el-menu
       class="el-menu-vertical"
       id="navBar"
@@ -18,28 +20,6 @@
         <i class="el-icon-menu"></i>
         <span slot="title">Dashboard</span>
       </el-menu-item>
-      <!-- <el-submenu index="1">
-        <template slot="title">
-          <i class="el-icon-location"></i>
-          <span slot="title">导航一</span>
-        </template>
-        <el-menu-item-group>
-          <span slot="title">分组一</span>
-          <el-menu-item index="1-1">选项1</el-menu-item>
-          <el-menu-item index="1-2">选项2</el-menu-item>
-        </el-menu-item-group>
-        <el-menu-item-group title="分组2">
-          <el-menu-item index="1-3">选项3</el-menu-item>
-        </el-menu-item-group>
-        <el-submenu index="1-4">
-          <span slot="title">选项4</span>
-          <el-menu-item index="1-4-1">选项1</el-menu-item>
-        </el-submenu>
-      </el-submenu>
-      <el-menu-item index="3" disabled>
-        <i class="el-icon-document"></i>
-        <span slot="title">导航三</span>
-      </el-menu-item> -->
       <el-menu-item v-if="this.user.role === 'patient'" index="booking">
         <i class="el-icon-date"></i>
         <span slot="title">Make Appointment</span>
@@ -108,6 +88,7 @@ import router from "../router";
 export default {
   data() {
     return {
+      // Component size
       windowHeight: document.body.clientHeight,
       windowWidth: document.body.clientWidth,
       isCollapse: false,
@@ -117,16 +98,19 @@ export default {
       user: {},
     };
   },
-  created: function () {
+  created: function() {
+    // If user has already logged in, save user data to sessionStorage
     if (sessionStorage.getItem("id") != null) {
       this.user.id = sessionStorage.getItem("id");
       this.user.name = sessionStorage.getItem("name");
       this.user.role = sessionStorage.getItem("role");
     } else {
+      // Else, jump to login page
       router.push("/");
     }
   },
   mounted() {
+    // Auto resize the component as window resized
     window.onresize = () => {
       return (() => {
         this.windowHeight = document.body.clientHeight;
@@ -135,36 +119,44 @@ export default {
     };
   },
   computed: {
-    height: function () {
+    // Decide the window height
+    height: function() {
       return this.windowHeight + "px";
     },
-    contentHeight: function () {
+    // Decide the content height
+    contentHeight: function() {
       return this.windowHeight - 60 + "px";
     },
-    greeting: function () {
+    // Welcome slogan
+    greeting: function() {
       return "Hello, " + this.user.name;
     },
   },
   methods: {
+    // Handle menu item "personal_info" clicked
     person() {
       this.$router.push("/person").catch((err) => {
         err;
       });
       location.reload();
     },
+    // Handle open menu item
     handleOpen(key, keyPath) {
       console.log(key, keyPath);
     },
+    // Handle close menu item
     handleClose(key, keyPath) {
       console.log(key, keyPath);
     },
+    // Handle menu item "logout" clicked
     logout() {
       sessionStorage.clear();
       router.push("/");
     },
   },
   watch: {
-    isCollapse: function () {
+    // Handle menu item collapse
+    isCollapse: function() {
       if (this.isCollapse) {
         setTimeout(() => {
           this.contentWidth = this.windowWidth - 65 + "px";
@@ -173,7 +165,7 @@ export default {
         this.contentWidth = this.windowWidth - 202 + "px";
       }
     },
-    windowWidth: function () {
+    windowWidth: function() {
       if (this.isCollapse) {
         this.contentWidth = this.windowWidth - 65 + "px";
       } else {
