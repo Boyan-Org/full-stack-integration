@@ -6,13 +6,15 @@ This is the course project for CSCI-410. We built a platform that allows easy an
 
 ![Booking Appointment](/public/static/appointment.png "Booking Appointment")
 
-![working schedule](/public/static/record.png "View my patient's medical record")
+![working schedule](/public/static/schedule.png "View my working schedule")
 
 With personal information and medical records digitized, we can provide a smooth workflow among departments and people that the needed information will be delivered to the right person and new information will be collected automatically to form a new record entry.
 
+![working schedule](/public/static/record.png "View my patient's medical record")
+
 ![Diagnosis](/public/static/diagnosis.png "Diagnose my patient")
 
-![working schedule](/public/static/schedule.png "View my working schedule")
+
 At the bottom level, all the account information and record data are encrypted. We will also implement an access control mechanism to ensure certain information is only visible to specific user groups.
 
 ### Major Dependency
