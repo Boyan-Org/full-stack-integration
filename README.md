@@ -1,6 +1,4 @@
-# Next-gen EHS 🐍
-![Vue Logo](/src/assets/logo-vue.png "Vue Logo")
-![Django Logo](/src/assets/logo-django.png "Django Logo")
+# Next-gen EHS 💉
 
 ## I. Introduction
 This is the course project for CSCI-410. We built a platform that allows easy and secure storage and retrieval of **medical records** for both the patients🤕 and the doctors👨🏻‍⚕️.
