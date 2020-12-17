@@ -1,17 +1,25 @@
+"""
+Test File
+
+Note that the basic functionalities (retrieve, create, update) of many parts of the backend
+work similarly because they all use Django ModelViewSet. 
+So, there is no duplicate test on these basic functionalities.
+However, the customized/additional methods are well tested.
+"""
 from backend.api.models import Account, Appointment, DepartmentInfo, MedicalRecord, PersonalInfo
-from django.http import response
 from django.test import TestCase
 from rest_framework.test import APIClient
 
 import datetime
 
-
 class RegisterTestCase(TestCase):
     def setUp(self):
+        """create an account for test_username_conflict"""
         self.client = APIClient()
         Account.objects.create(username="userfrank", password="frank", role="patient")
 
     def test_register(self):
+        """test a successful register"""
         response = self.client.post(
             '/api/register/',
             {
@@ -22,10 +30,10 @@ class RegisterTestCase(TestCase):
             },
             format = 'json',
         )
-        # print("response_content:", response.content)
         self.assertEqual(response.status_code, 201)
 
     def test_username_conflict(self):
+        """test the condition on unique username in register"""
         response = self.client.post(
             '/api/register/',
             {
@@ -41,6 +49,7 @@ class RegisterTestCase(TestCase):
 
 class LoginTestCase(TestCase):
     def setUp(self):
+        """register a new account"""
         self.client = APIClient()
         # register
         r = self.client.post(
@@ -54,6 +63,7 @@ class LoginTestCase(TestCase):
             format = 'json',
         )
     def test_login(self):
+        """test successful login"""
         response = self.client.post(
             '/api/login/',
             {
@@ -68,6 +78,7 @@ class LoginTestCase(TestCase):
 
 
     def test_wrong_username(self):
+        """test the case when the username does not exist in the database"""
         response = self.client.post(
             '/api/login/',
             {
@@ -79,6 +90,7 @@ class LoginTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
     
     def test_wrong_password(self):
+        """test wrong passord"""
         response = self.client.post(
             '/api/login/',
             {
@@ -92,6 +104,7 @@ class LoginTestCase(TestCase):
 
 class PersonalInfoTestCase(TestCase):
     def setUp(self):
+        """register, login, and set the expected keys and data for specific cases"""
         self.client = APIClient()
         # create account and personal_info
         self.client.post('/api/register/',{"username": "userfrank","password": "frank","role": "patient","name": "Frank Zhou"},format = 'json',)
@@ -103,10 +116,12 @@ class PersonalInfoTestCase(TestCase):
             "email":"zz1763@nyu.edu",
             }
     def test_patch_personal_info(self):
+        """test partial update personal_info"""
         response = self.client.patch("/api/personal_information/"+str(self.id)+"/", self.data, format='json')
         self.assertEqual(response.status_code, 200)
 
     def test_get_personal_info(self):
+        """test retrieve an entry of personal_info and check whether the returned data are correct"""
         self.test_patch_personal_info()
         response = self.client.get("/api/personal_information/"+str(self.id)+"/")
         self.assertEqual(response.status_code, 200)
@@ -117,6 +132,11 @@ class PersonalInfoTestCase(TestCase):
 
 class MedicalRecordTestCase(TestCase):
     def setUp(self):
+        """
+        create two patient accounts and a doctor account,
+        fill in the personal info and department info,
+        create a new record used as an existing in the testing restrictions
+        """
         self.client = APIClient()
         self.patient1 = Account.objects.create(username="userfrank", password="frank", role="patient")
         self.patient2 = Account.objects.create(username="useryijian", password="yijian", role="patient")
@@ -134,6 +154,7 @@ class MedicalRecordTestCase(TestCase):
             patient=self.patient2,
             flag=1
         )
+
     def test_create_medical_record(self):
         response = self.client.post(
             '/api/medical_record/',
@@ -149,7 +170,9 @@ class MedicalRecordTestCase(TestCase):
             format = 'json',
             )
         self.assertEqual(response.status_code, 200)
+
     def test_filter_record(self):
+        # create a new record
         self.test_create_medical_record()
         response = self.client.post(
             '/api/medical_record/filter_record/',
@@ -175,7 +198,6 @@ class MedicalRecordTestCase(TestCase):
     def test_retrieve_medical_record(self):
         self.test_create_medical_record()
         response = self.client.get('/api/medical_record/'+str(self.record.recordID)+'/')
-        print(type(response.data))
         self.assertEqual(response.data["attachmentNb"],0)
         self.assertEqual(response.data["dateTime"],datetime.datetime(2020, 11, 30, 0, 17, 34))
         self.assertEqual(response.data["department"],"department1")
@@ -192,6 +214,11 @@ class MedicalRecordTestCase(TestCase):
 
 class AppointmentTestCase(TestCase):
     def setUp(self):
+        """
+        create two patient accounts and a doctor account,
+        fill in the personal info and department info,
+        create two appointments used as existing appointments for testing restrictions.
+        """
         self.client = APIClient()
         self.patient1 = Account.objects.create(username="userfrank", password="frank", role="patient")
         self.patient2 = Account.objects.create(username="useryijian", password="yijian", role="patient")
@@ -202,6 +229,7 @@ class AppointmentTestCase(TestCase):
         self.appointment = Appointment.objects.create(date=datetime.datetime(2020,11,29), time="afternoon",submitTime=datetime.datetime(2020,11,28,20,00,00), doctor=self.doctor, patient=self.patient1)
 
     def test_create_appointment(self):
+        """test create an appointment successfully"""
         response = self.client.post(
             '/api/appointment/',
             {
@@ -215,6 +243,10 @@ class AppointmentTestCase(TestCase):
         self.assertEqual(response.status_code, 201)
     
     def test_create_too_many_appointments(self):
+        """
+        test create an appointment in a slot where 
+        the patient has already booked an appointment with the doctor
+        """
         response = self.client.post(
             '/api/appointment/',
             {
@@ -229,6 +261,7 @@ class AppointmentTestCase(TestCase):
         self.assertEqual(response.data["error"], "already booked in the slot")
 
     def test_doctor_not_available(self):
+        """test create an appointment in a slot which is not the doctor's working hour"""
         response = self.client.post(
             '/api/appointment/',
             {
@@ -243,6 +276,7 @@ class AppointmentTestCase(TestCase):
         self.assertEqual(response.data["error"], "doctor is not available")
 
     def test_appointment_slot_is_full(self):
+        """test when the booked slot is full (10 people)"""
         for i in range(10):
             patient = Account.objects.create(username=str(i), password="frank", role="patient")
             Appointment.objects.create(date=datetime.datetime(2020,12,10), time="morning",submitTime=datetime.datetime(2020,11,28,20,00,00), doctor=self.doctor, patient=patient)
@@ -261,6 +295,7 @@ class AppointmentTestCase(TestCase):
         self.assertEqual(response.data["error"], "more than ten appointment in a slot")
 
     def test_get_available_slots(self):
+        """test whether the available slot does not contain the illegal ones"""
         response = self.client.post(
             '/api/appointment/get_available_slots/',
             {
