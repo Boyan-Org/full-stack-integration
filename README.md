@@ -17,7 +17,7 @@ With personal information and medical records digitized, we can provide a smooth
 
 At the bottom level, all the account information and record data are encrypted. We will also implement an access control mechanism to ensure certain information is only visible to specific user groups.
 
-### Major Dependency
+## Major Dependency
 Backend side
 * Django
 * Django REST framework
@@ -30,7 +30,8 @@ Frontend side
 * Configuration for Heroku Deployment
 
 
-### Project Stricture
+## Major Dependency
+ Project Stricture
 
 - 📂 __django\-vue\-template__
    - 📄 [README.md](README.md)
@@ -120,6 +121,7 @@ $ python manage.py migrate
 ```
 - To inspect sqlite database from GUI, install [Sqlite Browser](https://sqlitebrowser.org/dl/)
 
+
 ## Running Development Servers
 
 **Step 1** : Run Django server
@@ -192,7 +194,7 @@ $ python manage.py test
   ```
 
 ### 3. `personal_information` API
-1. List all records
+1. List all `personal_information` records
     ```json
     PATH:
       `localhost:8000/api/personal_information/`
@@ -214,7 +216,7 @@ $ python manage.py test
                 200  : OK
                 Other: Buggy
     ```
-2. Create a record
+2. Create a `personal_information` record
    ```json
     PATH:
       `localhost:8000/api/personal_information/`
@@ -237,7 +239,7 @@ $ python manage.py test
         201: Created
         400: Creation Failed
    ```
-3. Retrieve record with id=x
+3. Retrieve `personal_information` record with id=x
     ```json
     PATH:
         localhost:8000/api/personal_info/<int>
@@ -262,7 +264,7 @@ $ python manage.py test
         404: Record Not Found
     ```
 
-4. Delete record with id=x
+4. Delete `personal_information` record with id=x
     ```json
     PATH:
         localhost:8000/api/personal_info/<int>
@@ -273,7 +275,7 @@ $ python manage.py test
                 204: Deleted
                 404: Not Found
     ```
-5. Updata record with id=x
+5. Update `personal_information` record with id=x
     ```json
     PATH:
         localhost:8000/api/personal_info/<int>
@@ -302,7 +304,7 @@ $ python manage.py test
 
 ### 4. `medical_info` API
 
-1. List all records
+1. List all `medical_info` records
     ```json
     PATH:
       localhost:8000/api/medical_information/
@@ -324,7 +326,7 @@ $ python manage.py test
                 200  : OK
                 Other: Buggy
     ```
-2. Create a record
+2. Create  `medical_info` record
    ```json
     PATH:
       localhost:8000/api/medical_information/<int>
@@ -346,7 +348,7 @@ $ python manage.py test
         201: Created
         400: Creation Failed
    ```
-3. Retrieve record with id=x
+3. Retrieve `medical_info` record with id=x
     ```json
     PATH:
       localhost:8000/api/medical_information/<int>
@@ -370,7 +372,7 @@ $ python manage.py test
         404: Record Not Found
     ```
 
-4. Delete record with id=x
+4. Delete `medical_info` record with id=x
     ```json
     PATH:
       localhost:8000/api/medical_information/<int>
@@ -381,7 +383,7 @@ $ python manage.py test
                 204: Deleted
                 404: Not Found
     ```
-5. Updata record with id=x
+5. Update `medical_info` record with id=x
     ```json
     PATH:
       localhost:8000/api/medical_information/<int>
@@ -407,25 +409,13 @@ $ python manage.py test
                 400: Update Failed
     ```
 
-### 5. `dept_info` API
-
-PATH: http://127.0.0.1:8000/api/department_information/
-
-`workingHour` format example:
-
-[[0,1],[0,0],[1,0],[1,1],[1,1],[0,0],[0,1]]
-
-From Monday to Sunday
-
-0 means on-duty; 1 means off.
-
-### 6. `medical_record`
+### 5. `medical_record`
 
 
 PATH: http://127.0.0.1:8000/api/medical_record/
 
 
-1. List all records
+1. List all `medical_record` records
     ```json
     PATH:
       localhost:8000/api/medical_record/
@@ -447,7 +437,7 @@ PATH: http://127.0.0.1:8000/api/medical_record/
                 200  : OK
                 Other: Buggy
     ```
-2. Create a record
+2. Create a `medical_record` record
    ```json
     PATH:
       localhost:8000/api/medical_record/<int>
@@ -469,7 +459,7 @@ PATH: http://127.0.0.1:8000/api/medical_record/
         201: Created
         400: Creation Failed
    ```
-3. Retrieve record with id=x
+3. Retrieve `medical_record` record with id=x
     ```json
     PATH:
       localhost:8000/api/medical_record/<int>
@@ -500,7 +490,7 @@ PATH: http://127.0.0.1:8000/api/medical_record/
         404: Record Not Found
     ```
 
-4. Delete record with id=x
+4. Delete `medical_record` record with id=x
     ```json
     PATH:
       localhost:8000/api/medical_record/<int>
@@ -511,7 +501,7 @@ PATH: http://127.0.0.1:8000/api/medical_record/
                 204: Deleted
                 404: Not Found
     ```
-5. Updata record with id=x
+5. Update `medical_record` record with id=x
     ```json
     PATH:
       localhost:8000/api/medical_record/<int>
@@ -545,7 +535,7 @@ PATH: http://127.0.0.1:8000/api/medical_record/
     ```
 
 
-6. Filter record with given condition
+6. Filter `medical_record` record with given condition
     ```json
     PATH:
         localhost/api/medical_record/filter_record/
@@ -571,6 +561,19 @@ PATH: http://127.0.0.1:8000/api/medical_record/
           record_num: 1
         }
     ```
+
+### 6. `dept_info` API
+
+PATH: http://127.0.0.1:8000/api/department_information/
+
+`workingHour` format example:
+
+[[0,1],[0,0],[1,0],[1,1],[1,1],[0,0],[0,1]]
+
+From Monday to Sunday
+
+0 means on-duty; 1 means off.
+
 ### 7. `Appointment`
 
 Similar to personal_info. See concrete fields/values in the database diagram
