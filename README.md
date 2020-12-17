@@ -313,13 +313,13 @@ $ python manage.py test
 
     Response Format:
         {
-          bloodType: "A",
-          height: 180,
-          weight: 50,
-          allergies: "None",
-          familyHistory: "None",
+          bloodType      : "A",
+          height         : 180,
+          weight         : 50,
+          allergies      : "None",
+          familyHistory  : "None",
           surgicalHistory: "None",
-          habits: "None",
+          habits         : "None",
         }
 
     Response Status:
@@ -335,13 +335,13 @@ $ python manage.py test
 
     Request Format:
         {
-          bloodType: "A",
-          height: 180,
-          weight: 50,
-          allergies: "None",
-          familyHistory: "None",
+          bloodType      : "A",
+          height         : 180,
+          weight         : 50,
+          allergies      : "None",
+          familyHistory  : "None",
           surgicalHistory: "None",
-          habits: "None",
+          habits         : "None",
         }
 
     Response Status:
@@ -358,13 +358,13 @@ $ python manage.py test
 
     Response Format:
         {
-          bloodType: "A",
-          height: 180,
-          weight: 50,
-          allergies: "None",
-          familyHistory: "None",
+          bloodType      : "A",
+          height         : 180,
+          weight         : 50,
+          allergies      : "None",
+          familyHistory  : "None",
           surgicalHistory: "None",
-          habits: "None",
+          habits         : "None",
         }
 
     Response Status:
@@ -392,13 +392,13 @@ $ python manage.py test
 
     Request Format: (Attributes are optionally given)
         {
-          bloodType: "A",
-          height: 180,
-          weight: 50,
-          allergies: "None",
-          familyHistory: "None",
+          bloodType      : "A",
+          height         : 180,
+          weight         : 50,
+          allergies      : "None",
+          familyHistory  : "None",
           surgicalHistory: "None",
-          habits: "None",
+          habits         : "None",
         }
 
     Response Format: Same as request payload
@@ -424,13 +424,13 @@ PATH: http://127.0.0.1:8000/api/medical_record/
 
     Response Format:
         {
-          bloodType: "A",
-          height: 180,
-          weight: 50,
-          allergies: "None",
-          familyHistory: "None",
+          bloodType      : "A",
+          height         : 180,
+          weight         : 50,
+          allergies      : "None",
+          familyHistory  : "None",
           surgicalHistory: "None",
-          habits: "None",
+          habits         : "None",
         }
 
     Response Status:
@@ -446,13 +446,13 @@ PATH: http://127.0.0.1:8000/api/medical_record/
 
     Request Format:
         {
-          bloodType: "A",
-          height: 180,
-          weight: 50,
-          allergies: "None",
-          familyHistory: "None",
+          bloodType      : "A",
+          height         : 180,
+          weight         : 50,
+          allergies      : "None",
+          familyHistory  : "None",
           surgicalHistory: "None",
-          habits: "None",
+          habits         : "None",
         }
 
     Response Status:
@@ -469,20 +469,20 @@ PATH: http://127.0.0.1:8000/api/medical_record/
 
     Response Format:
             {
-              recordID: 1,
-              patient_id : 1,
-              patient_name : "Frank",
-              doctor_id : 1
-              doctor_name : "Boyan",
-              symptoms : "Headache",
-              treatments : "Sleep more",
-              diagnosis : "神经衰弱",
-              department : "神经内科",
+              recordID        : 1,
+              patient_id      : 1,
+              patient_name    : "Frank",
+              doctor_id       : 1
+              doctor_name     : "Boyan",
+              symptoms        : "Headache",
+              treatments      : "Sleep more",
+              diagnosis       : "神经衰弱",
+              department      : "神经内科",
               patient_birthday: "1998-02-12",
-              patient_gender :"Male",
-              dateTime : "2020-12-21",
-              attachmentNb : "2",
-              flag : false,
+              patient_gender  : "Male",
+              dateTime        : "2020-12-21",
+              attachmentNb    : "2",
+              flag            : false,
             }
 
     Response Status:
@@ -510,20 +510,20 @@ PATH: http://127.0.0.1:8000/api/medical_record/
 
     Request Format: (Attributes are optionally given)
             {
-              recordID: 1,
-              patient_id : 1,
-              patient_name : "Frank",
-              doctor_id : 1
-              doctor_name : "Boyan",
-              symptoms : "Headache",
-              treatments : "Sleep more",
-              diagnosis : "神经衰弱",
-              department : "神经内科",
+              recordID        : 1,
+              patient_id      : 1,
+              patient_name    : "Frank",
+              doctor_id       : 1
+              doctor_name     : "Boyan",
+              symptoms        : "Headache",
+              treatments      : "Sleep more",
+              diagnosis       : "神经衰弱",
+              department      : "神经内科",
               patient_birthday: "1998-02-12",
-              patient_gender :"Male",
-              dateTime : "2020-12-21",
-              attachmentNb : "2",
-              flag : false,
+              patient_gender  : "Male",
+              dateTime        : "2020-12-21",
+              attachmentNb    : "2",
+              flag            : false,
             }
 
     Response Format: Same as request payload
@@ -551,11 +551,11 @@ PATH: http://127.0.0.1:8000/api/medical_record/
         {
           record_data: [
               {
-                "dateTime": "2020-11-29T00:17:34",
-                "department": "dept1",
-                "doctor_name": "Boyan Xu",
+                "dateTime"    : "2020-11-29T00:17:34",
+                "department"  : "dept1",
+                "doctor_name" : "Boyan Xu",
                 "patient_name": "Frank Zhou",
-                "recordID": 1
+                "recordID"    : 1
               }
           ],
           record_num: 1
