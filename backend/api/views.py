@@ -13,10 +13,9 @@ from .models import Account, PersonalInfo, MedicalInfo, DepartmentInfo, MedicalR
 from .serializers import AccountSerializer, PISerializer, DISerializer, MISerializer, MRSerializer, AppSerializer
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import action
-from django.shortcuts import get_object_or_404
-# from rest_framework.views import APIView
 
-# Serve Vue Application
+
+
 index_view = never_cache(TemplateView.as_view(template_name='index.html'))
 
 
