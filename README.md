@@ -2,6 +2,7 @@
 ![Vue Logo](/src/assets/logo-vue.png "Vue Logo")
 ![Django Logo](/src/assets/logo-django.png "Django Logo")
 
+## I. Introduction
 This is the course project for CSCI-410. We built a platform that allows easy and secure storage and retrieval of **medical records** for both the patients🤕 and the doctors👨🏻‍⚕️.
 
 ![Booking Appointment](/public/static/appointment.png "Booking Appointment")
@@ -17,21 +18,66 @@ With personal information and medical records digitized, we can provide a smooth
 
 At the bottom level, all the account information and record data are encrypted. We will also implement an access control mechanism to ensure certain information is only visible to specific user groups.
 
-## Major Dependency
-Backend side
-* Django
-* Django REST framework
-* Django Whitenoise, CDN Ready
+## Ⅱ. Prerequisites
 
-Frontend side
-* Vue CLI 3
-* Vue Router
-* Gunicorn
-* Configuration for Heroku Deployment
+Before getting started you should have the following installed and running:
+
+- [X] Yarn - [instructions](https://yarnpkg.com/en/docs/install)
+- [X] Vue CLI 3 - [instructions](https://cli.vuejs.org/guide/installation.html)
+- [X] Python 3 - [instructions](https://wiki.python.org/moin/BeginnersGuide)
+- [X] Anaconda - [instructions](https://www.anaconda.com/products/individual)
 
 
-## Major Dependency
- Project Stricture
+## Ⅲ. Setup Codebase
+
+**Step 1** : Clone the repo to local machine
+
+```
+$ git clone https://github.com/Boyan-Org/full-stack-integration
+$ cd full-stack-integration
+```
+
+**Step 2** : Install JavaScript dependencies
+```
+$ yarn install
+```
+**Step 3** : Initialize python virtual environment ([why?](https://stackoverflow.com/questions/41972261/what-is-a-virtualenv-and-why-should-i-use-one))
+```
+$ conda create -n venv
+$ conda activate venv
+```
+**Step 4** : Install Python dependencies
+```
+$ pip install -r requirement.txt
+```
+**Step 5** : Initialize sqlite database
+```
+$ python manage.py migrate
+```
+- To inspect sqlite database from GUI, install [Sqlite Browser](https://sqlitebrowser.org/dl/)
+
+
+## Ⅳ. Running Development Servers
+
+**Step 1** : Run Django server
+```
+$ python manage.py runserver
+```
+- The Django API and static files will be served from [`localhost:8000`](http://localhost:8000/).
+
+**Step 2** : Run Vue.js server (in another tab)
+```
+$ yarn serve
+```
+- The Vue application will be served from [`localhost:8080`](http://localhost:8080/)
+
+## Ⅴ. Run Unit Test
+We have a series of unit test to help our develop procedure. The way to call test is:
+```sh
+$ python manage.py test
+```
+
+## Ⅵ. Project Stricture
 
 - 📂 __django\-vue\-template__
    - 📄 [README.md](README.md)
@@ -82,67 +128,7 @@ Frontend side
      - 📄 [router.js](src/router.js)
    - 📄 [vue.config.js](vue.config.js)
 
-
-
-## Prerequisites
-
-Before getting started you should have the following installed and running:
-
-- [X] Yarn - [instructions](https://yarnpkg.com/en/docs/install)
-- [X] Vue CLI 3 - [instructions](https://cli.vuejs.org/guide/installation.html)
-- [X] Python 3 - [instructions](https://wiki.python.org/moin/BeginnersGuide)
-- [X] Anaconda - [instructions](https://www.anaconda.com/products/individual)
-
-## Setup Codebase
-
-**Step 1** : Clone the repo to local machine
-
-```
-$ git clone https://github.com/Boyan-Org/full-stack-integration
-$ cd full-stack-integration
-```
-
-**Step 2** : Install JavaScript dependencies
-```
-$ yarn install
-```
-**Step 3** : Initialize python virtual environment ([why?](https://stackoverflow.com/questions/41972261/what-is-a-virtualenv-and-why-should-i-use-one))
-```
-$ conda create -n venv
-$ conda activate venv
-```
-**Step 4** : Install Python dependencies
-```
-$ pip install -r requirement.txt
-```
-**Step 5** : Initialize sqlite database
-```
-$ python manage.py migrate
-```
-- To inspect sqlite database from GUI, install [Sqlite Browser](https://sqlitebrowser.org/dl/)
-
-
-## Running Development Servers
-
-**Step 1** : Run Django server
-```
-$ python manage.py runserver
-```
-- The Django API and static files will be served from [`localhost:8000`](http://localhost:8000/).
-
-**Step 2** : Run Vue.js server (in another tab)
-```
-$ yarn serve
-```
-- The Vue application will be served from [`localhost:8080`](http://localhost:8080/)
-
-## Run Unit Test
-We have a series of unit test to help our develop procedure. The way to call test is:
-```sh
-$ python manage.py test
-```
-
-## API Document
+## Ⅶ. API Document
 ### 1. Login API
   ```json
   PATH:
