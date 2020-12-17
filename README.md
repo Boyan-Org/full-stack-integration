@@ -551,13 +551,12 @@ PATH: http://127.0.0.1:8000/api/medical_record/
         {
           record_data: [
               {
-                "dateTime"    : "2020-11-29T00:17:34",
-                "department"  : "dept1",
-                "doctor_name" : "Boyan Xu",
-                "patient_name": "Frank Zhou",
-                "recordID"    : 1
-              }
-          ],
+                dateTime    : "2020-11-29T00:17:34",
+                department  : "dept1",
+                doctor_name : "Boyan Xu",
+                patient_name: "Frank Zhou",
+                recordID    : 1
+              },],
           record_num: 1
         }
     ```
